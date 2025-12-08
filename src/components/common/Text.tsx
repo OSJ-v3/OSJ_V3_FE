@@ -1,18 +1,21 @@
 import type { ComponentProps } from "react"
 import styled from "styled-components"
+import type { DefaultTheme } from "styled-components"
 import type { fontsKeyOfType } from "../../styles/fonts"
 import { Fonts } from "../../styles/fonts"
+import type { Colors } from "../../styles/colors/lightColors"
 
-import { lightColors } from "../../styles/colors/lightColors"
-export type Colors = typeof lightColors
+type MainKeys = keyof Colors["Main"]
+type GrayKeys = keyof Colors["Gray"]
+type SubKeys = keyof Colors["Sub"]
 
-type ColorKey =
+export type ColorKey =
     | "Surface"
-    | "System.InserveSurface"
+    | "System.InverseSurface"
     | "System.OnSurface"
-    | `Main.${keyof typeof import("../../styles/colors/lightColors").lightColors.Main}`
-    | `Gray.${keyof typeof import("../../styles/colors/lightColors").lightColors.Gray}`
-    | `Sub.${keyof typeof import("../../styles/colors/lightColors").lightColors.Sub}`
+    | `Main.${MainKeys}`
+    | `Gray.${GrayKeys}`
+    | `Sub.${SubKeys}`
 
 type Props = ComponentProps<"span"> & {
     font?: fontsKeyOfType
@@ -21,11 +24,10 @@ type Props = ComponentProps<"span"> & {
 
 const fontToCss = (font: fontsKeyOfType) => {
     const style = Fonts[font]
-
     return `
-    font-size: ${style.fontSize};
-    font-weight: ${style.fontWeight};
-  `
+        font-size: ${style.fontSize};
+        font-weight: ${style.fontWeight};
+    `
 }
 
 const StyledText = styled.span<{
@@ -33,33 +35,28 @@ const StyledText = styled.span<{
     $color: ColorKey
 }>`
     ${({ $font }) => fontToCss($font)};
-
     color: ${({ theme, $color }) => {
+        const colors = theme.colors as DefaultTheme["colors"]
         const parts = $color.split(".")
 
         if (parts.length === 1) {
-            const group = parts[0] as keyof typeof theme.colors
-            return theme.colors[group]
+            const group = parts[0] as keyof typeof colors
+            return colors[group]
         }
 
         const [group, key] = parts
-        const groupObj = theme.colors[group as keyof typeof theme.colors]
+        const groupObj = colors[group as keyof typeof colors]
 
-        if (typeof groupObj === "string") {
-            return groupObj
-        }
+        if (typeof groupObj === "string") return groupObj
+        if (key in groupObj) return (groupObj as Record<string, string>)[key]
 
-        if (key in groupObj) {
-            return groupObj[key as keyof typeof groupObj]
-        }
-
-        return theme.colors.System.OnSurface
+        return colors.System.OnSurface
     }};
 `
 
 export const Text = ({
     font = "body1",
-    color = "System.InserveSurface",
+    color = "System.InverseSurface",
     children,
     ...props
 }: Props) => {
