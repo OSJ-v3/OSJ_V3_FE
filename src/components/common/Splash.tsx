@@ -2,7 +2,6 @@ import styled, { keyframes } from "styled-components"
 import { useEffect, useState } from "react"
 import { useSystemTheme } from "../../hooks/useSystemTheme"
 import { useThemeStore } from "../../stores/useThemeStore"
-import { darkTheme, lightTheme } from "../../styles/theme"
 import darkLogo from "/splash/logo-dark.png"
 import lightLogo from "/splash/logo-light.png"
 
@@ -20,12 +19,10 @@ export function Splash() {
 
     const currentTheme = mode === "system" ? systemTheme : mode
 
-    const appliedTheme = currentTheme === "dark" ? darkTheme : lightTheme
-
     const logo = currentTheme === "dark" ? darkLogo : lightLogo
 
     return (
-        <Wrapper background={appliedTheme.colors.Surface}>
+        <Wrapper>
             <Logo src={logo} alt="logo" />
         </Wrapper>
     )
@@ -43,10 +40,10 @@ const bgFadeInOut = keyframes`
   100% { opacity: 0; }
 `
 
-const Wrapper = styled.div<{ background: string }>`
+const Wrapper = styled.div`
     position: fixed;
     inset: 0;
-    background: ${(p) => p.background};
+    background: ${({ theme }) => theme.colors.Surface};
     display: flex;
     justify-content: center;
     align-items: center;
