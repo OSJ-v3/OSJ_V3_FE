@@ -7,12 +7,19 @@ export default defineConfig({
         react(),
         VitePWA({
             registerType: "autoUpdate",
+
+            workbox: {
+                cleanupOutdatedCaches: true,
+                navigateFallback: "/index.html",
+            },
+
             includeAssets: [
                 "icons/favicon.ico",
                 "icons/icon-192.png",
                 "icons/icon-512.png",
                 "splash/apple-touch-icon.png",
             ],
+
             manifest: {
                 name: "OSJ",
                 short_name: "OSJ",
