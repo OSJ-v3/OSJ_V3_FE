@@ -3,6 +3,9 @@ import styled from "styled-components"
 import type { fontsKeyOfType } from "../../styles/fonts"
 import { Fonts } from "../../styles/fonts"
 
+import { lightColors } from "../../styles/colors/lightColors"
+export type Colors = typeof lightColors
+
 type ColorKey =
     | "Surface"
     | "System.InserveSurface"
@@ -32,15 +35,25 @@ const StyledText = styled.span<{
     ${({ $font }) => fontToCss($font)};
 
     color: ${({ theme, $color }) => {
-        const [group, key] = $color.split(".")
+        const parts = $color.split(".")
 
-        if (!key) {
-            return theme.colors[group as "Surface"]
+        if (parts.length === 1) {
+            const group = parts[0] as keyof typeof theme.colors
+            return theme.colors[group]
         }
 
-        return theme.colors[group as "System" | "Main" | "Gray" | "Sub"][
-            key as never
-        ]
+        const [group, key] = parts
+        const groupObj = theme.colors[group as keyof typeof theme.colors]
+
+        if (typeof groupObj === "string") {
+            return groupObj
+        }
+
+        if (key in groupObj) {
+            return groupObj[key as keyof typeof groupObj]
+        }
+
+        return theme.colors.System.OnSurface
     }};
 `
 
