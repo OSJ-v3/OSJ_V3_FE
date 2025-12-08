@@ -8,8 +8,17 @@ import { AppLayout } from "./styles/AppLayout"
 import "./styles/global.css"
 import { Text } from "./components/common/Text"
 import { Splash } from "./components/common/Splash"
+import { useEffect } from "react"
 
 function App() {
+    useEffect(() => {
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.getRegistrations().then((regs) => {
+                regs.forEach((reg) => reg.update())
+            })
+        }
+    }, [])
+
     const { mode } = useThemeStore()
     const systemTheme = useSystemTheme()
 
