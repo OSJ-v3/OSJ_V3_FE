@@ -7,6 +7,7 @@ import { GlobalStyle } from "./styles/GlobalStyle"
 import { AppLayout } from "./styles/AppLayout"
 import "./styles/global.css"
 import { Text } from "./components/common/Text"
+import { Splash } from "./components/common/Splash"
 
 function App() {
     const { mode } = useThemeStore()
@@ -20,12 +21,12 @@ function App() {
             : mode === "dark"
             ? darkTheme
             : lightTheme
-    // const appliedTheme = lightTheme
 
     useThemeColor(appliedTheme.colors.Surface)
 
     return (
         <>
+            <Splash />
             <ThemeProvider theme={appliedTheme}>
                 <GlobalStyle />
                 <AppLayout>
