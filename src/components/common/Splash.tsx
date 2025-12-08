@@ -3,6 +3,8 @@ import { useEffect, useState } from "react"
 import { useSystemTheme } from "../../hooks/useSystemTheme"
 import { useThemeStore } from "../../stores/useThemeStore"
 import { darkTheme, lightTheme } from "../../styles/theme"
+import darkLogo from "/splash/logo-dark.png"
+import lightLogo from "/splash/logo-light.png"
 
 export function Splash() {
     const { mode } = useThemeStore()
@@ -20,10 +22,7 @@ export function Splash() {
 
     const appliedTheme = currentTheme === "dark" ? darkTheme : lightTheme
 
-    const logo =
-        currentTheme === "dark"
-            ? "/splash/logo-dark.png"
-            : "/splash/logo-light.png"
+    const logo = currentTheme === "dark" ? darkLogo : lightLogo
 
     return (
         <Wrapper background={appliedTheme.colors.Surface}>
