@@ -25,7 +25,7 @@ export interface ColorGray {
 }
 
 export interface ColorSystem {
-    InserveSurface: string
+    InverseSurface: string
     OnSurface: string
 }
 

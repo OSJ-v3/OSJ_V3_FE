@@ -34,19 +34,17 @@ function App() {
     useThemeColor(appliedTheme.colors.Surface)
 
     return (
-        <>
+        <ThemeProvider theme={appliedTheme}>
             <Splash />
-            <ThemeProvider theme={appliedTheme}>
-                <GlobalStyle />
-                <AppLayout>
-                    <Text>HelloWorld</Text>
-                    <Text font={"caption"}>HelloWorld</Text>
-                    <Text font={"heading1"} color="Main.Primary">
-                        HelloWorld
-                    </Text>
-                </AppLayout>
-            </ThemeProvider>
-        </>
+            <GlobalStyle />
+            <AppLayout>
+                <Text>HelloWorld</Text>
+                <Text font={"caption"}>HelloWorld</Text>
+                <Text font={"heading1"} color="Main.Primary">
+                    HelloWorld
+                </Text>
+            </AppLayout>
+        </ThemeProvider>
     )
 }
 

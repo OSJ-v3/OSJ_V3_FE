@@ -25,7 +25,7 @@ export const darkColors = {
         SurfaceContainerHigh: "#FBFBFC",
     },
     System: {
-        InserveSurface: "#FFFFFF",
+        InverseSurface: "#FFFFFF",
         OnSurface: "#000000",
     },
     Sub: {
@@ -36,4 +36,4 @@ export const darkColors = {
     },
 }
 
-export type colorsKeyOfType = keyof typeof darkColors
+export type Colors = typeof darkColors

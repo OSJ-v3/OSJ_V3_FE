@@ -24,9 +24,8 @@ export const lightColors = {
         SurfaceContainerHighest: "#6F6D72",
         SurfaceContainerHigh: "#5C5A5F",
     },
-
     System: {
-        InserveSurface: "#000000",
+        InverseSurface: "#000000",
         OnSurface: "#ffffff",
     },
     Sub: {
@@ -37,4 +36,4 @@ export const lightColors = {
     },
 }
 
-export type colorsKeyOfType = keyof typeof lightColors
+export type Colors = typeof lightColors
