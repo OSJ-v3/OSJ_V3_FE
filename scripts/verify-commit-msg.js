@@ -15,7 +15,7 @@ const validateCommitMessage = (commitMessage) => {
         .map((token) => token.trim())
 
     return (
-        ["feat", "fix", "chore", "style"].includes(type) &&
+        ["feat", "fix", "chore", "style", "remove"].includes(type) &&
         message &&
         !message.includes(":")
     )
