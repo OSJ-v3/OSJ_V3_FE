@@ -8,6 +8,10 @@ export default defineConfig({
         VitePWA({
             registerType: "autoUpdate",
 
+            devOptions: {
+                enabled: true,
+            },
+
             workbox: {
                 cleanupOutdatedCaches: true,
                 navigateFallback: "/index.html",
@@ -20,6 +24,7 @@ export default defineConfig({
                 "splash/apple-touch-icon.png",
             ],
 
+            manifestFilename: "manifest.webmanifest",
             manifest: {
                 name: "OSJ",
                 short_name: "OSJ",
