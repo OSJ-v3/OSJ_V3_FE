@@ -6,9 +6,9 @@ import { useThemeColor } from "./hooks/useThemeColor"
 import { GlobalStyle } from "./styles/GlobalStyle"
 import { AppLayout } from "./styles/AppLayout"
 import "./styles/global.css"
-import { Text } from "./components/common/Text"
 import { Splash } from "./components/common/Splash"
 import { useEffect } from "react"
+import { Device } from "./components/items/Device"
 
 function App() {
     useEffect(() => {
@@ -38,11 +38,10 @@ function App() {
             <Splash />
             <GlobalStyle />
             <AppLayout>
-                <Text>HelloWorld</Text>
-                <Text font={"caption"}>HelloWorld</Text>
-                <Text font={"heading1"} color="Main.Primary">
-                    HelloWorld
-                </Text>
+                <Device id={1} type="DRY" state={0} />
+                <Device id={1} type="WASH" state={1} />
+                <Device id={1} type="DRY" state={2} />
+                <Device id={1} type="WASH" state={3} />
             </AppLayout>
         </ThemeProvider>
     )
