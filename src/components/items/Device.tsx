@@ -75,7 +75,7 @@ export function Device({ id, type, state }: IProps) {
 }
 
 const Wrapper = styled.div<{ $border: string }>`
-    width: 164px;
+    width: 47%;
     background: ${({ theme }) => theme.colors.Surface};
     border-radius: 12px;
     padding: 20px 22px;
