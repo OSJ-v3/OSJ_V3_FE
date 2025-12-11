@@ -47,6 +47,7 @@ export function Toast({ text, type, visible = true }: ToastProps) {
 }
 
 const Wrapper = styled.div`
+    z-index: 9999;
     position: fixed;
     bottom: 58px;
     left: 0;

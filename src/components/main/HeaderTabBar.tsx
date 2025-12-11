@@ -27,7 +27,7 @@ export function HeaderTabBar({
 }
 
 const HeaderWrapper = styled.div`
-    width: 90%;
+    width: 100%;
     height: 57px;
 
     display: flex;
