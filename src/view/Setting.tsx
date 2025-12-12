@@ -9,7 +9,7 @@ import { Moon, Settings, Sun } from "lucide-react"
 export function Setting() {
     const theme = useTheme()
     const navigate = useNavigate()
-    const [mode, setMode] = useState<"light" | "dark" | "system">("dark")
+    const [mode] = useState<"light" | "dark" | "system">("dark")
 
     return (
         <>
