@@ -34,13 +34,13 @@ const AppScreen = styled.div`
 
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: start;
 `
 
 const Display = styled.div`
     width: 90%;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: start;
     flex-direction: column;
 `

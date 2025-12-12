@@ -1,14 +1,16 @@
 import styled, { useTheme } from "styled-components"
 import { BellIcon } from "../../../assets/icons/bell"
+import { useNavigate } from "react-router-dom"
 
 export function Notice() {
     const theme = useTheme()
+    const navigate = useNavigate()
 
-    // 읽지 않은 알림 여부 (테스트용)
+    // 읽지 않은 알림 여부
     const hasUnread = true
 
     return (
-        <BellWrapper>
+        <BellWrapper onClick={() => navigate("/notice")}>
             <BellIcon color={theme.colors.Gray.OnSecondary} />
 
             {hasUnread && <UnreadDot />}
