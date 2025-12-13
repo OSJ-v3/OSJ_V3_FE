@@ -1,17 +1,17 @@
-import { useState } from "react"
 import { AreaSelector } from "../../components/main/AreaSelector"
 import { Female } from "./Female"
 import { MaleDorm } from "./MaleDorm"
 import { MaleSchool } from "./MaleSchool"
+import { useAreaStore } from "../../stores/useAreaStore"
+import { useState } from "react"
 
 export function Status() {
-    const [area, setArea] = useState<"남자 학교측" | "남자 기숙사측" | "여자">(
-        "남자 학교측"
-    )
+    const { area } = useAreaStore()
+    const [present, setPresent] = useState(area)
 
     return (
         <>
-            <AreaSelector value={area} onChange={setArea} />
+            <AreaSelector value={present} onChange={setPresent} />
             {area == "남자 학교측" && <MaleSchool />}
             {area == "남자 기숙사측" && <MaleDorm />}
             {area == "여자" && <Female />}

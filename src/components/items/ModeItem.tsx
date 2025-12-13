@@ -1,21 +1,25 @@
 import { Check } from "lucide-react"
 import styled, { useTheme } from "styled-components"
-import type { ThemeMode } from "../../stores/useThemeStore"
 import { Text } from "../common/Text"
 
-interface ModeItemProps {
+interface ModeItemProps<T extends string> {
     label: string
-    value: ThemeMode
-    current: ThemeMode
-    onSelect: (mode: ThemeMode) => void
+    value: T
+    current: T
+    onSelect: (value: T) => void
 }
 
-export function ModeItem({ label, value, current, onSelect }: ModeItemProps) {
+export function ModeItem<T extends string>({
+    label,
+    value,
+    current,
+    onSelect,
+}: ModeItemProps<T>) {
     const theme = useTheme()
     const selected = value === current
 
     return (
-        <ModeRow onClick={() => onSelect(value)}>
+        <Container $selected={selected} onClick={() => onSelect(value)}>
             <Text font={"button1"} color="System.InverseSurface">
                 {label}
             </Text>
@@ -26,15 +30,15 @@ export function ModeItem({ label, value, current, onSelect }: ModeItemProps) {
                     strokeWidth={3}
                 />
             )}
-        </ModeRow>
+        </Container>
     )
 }
 
-const ModeRow = styled.div`
+const Container = styled.div<{ $selected: boolean }>`
+    padding: 14px 16px;
+    border-radius: 12px;
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0;
-    font-size: 16px;
-    cursor: pointer;
 `
