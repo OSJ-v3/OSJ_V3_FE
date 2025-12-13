@@ -2,6 +2,7 @@ import styled, { keyframes } from "styled-components"
 import { type ReactNode, useEffect, useRef, useState } from "react"
 import { Text } from "./Text"
 import { ChevronDown } from "lucide-react"
+import { createPortal } from "react-dom"
 
 interface BottomSheetProps {
     title: string
@@ -18,6 +19,7 @@ export function BottomSheet({
     actions,
     onClose,
 }: BottomSheetProps) {
+    const [top, setTop] = useState(0)
     const [closing, setClosing] = useState(false)
     const closedRef = useRef(false)
 
@@ -34,8 +36,35 @@ export function BottomSheet({
         return () => window.removeEventListener("keydown", handleEsc)
     }, [])
 
-    return (
-        <Overlay $closing={closing} onClick={handleClose}>
+    useEffect(() => {
+        setTop(window.scrollY)
+    }, [])
+
+    useEffect(() => {
+        const scrollY = window.scrollY
+
+        document.body.style.position = "fixed"
+        document.body.style.top = `-${scrollY}px`
+        document.body.style.left = "0"
+        document.body.style.right = "0"
+        document.body.style.width = "100%"
+
+        return () => {
+            document.body.style.position = ""
+            document.body.style.top = ""
+            document.body.style.left = ""
+            document.body.style.right = ""
+            document.body.style.width = ""
+
+            window.scrollTo(0, scrollY)
+        }
+    }, [])
+
+    const portalRoot = document.getElementById("bottom-sheet-root")
+    if (!portalRoot) return null
+
+    return createPortal(
+        <Overlay $top={top} $closing={closing} onClick={handleClose}>
             <Sheet
                 $closing={closing}
                 onClick={(e) => e.stopPropagation()}
@@ -65,7 +94,8 @@ export function BottomSheet({
 
                 {actions && <ActionArea>{actions}</ActionArea>}
             </Sheet>
-        </Overlay>
+        </Overlay>,
+        portalRoot
     )
 }
 
@@ -79,12 +109,15 @@ const slideDown = keyframes`
     to { transform: translateY(100%); }
 `
 
-const Overlay = styled.div<{ $closing: boolean }>`
+const Overlay = styled.div<{
+    $closing: boolean
+    $top: number
+}>`
     position: absolute;
     left: 0;
     right: 0;
-    top: 0;
-    bottom: 0;
+    top: ${({ $top }) => `${$top}px`};
+    height: 100vh;
     overflow: hidden;
 
     background: rgba(0, 0, 0, 0.45);
@@ -93,8 +126,6 @@ const Overlay = styled.div<{ $closing: boolean }>`
     display: flex;
     align-items: flex-end;
     z-index: 999;
-
-    pointer-events: ${({ $closing }) => ($closing ? "none" : "auto")};
 `
 
 const Sheet = styled.div<{ $closing: boolean }>`
