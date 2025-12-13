@@ -1,5 +1,7 @@
-import styled from "styled-components"
-import { type ReactNode, useEffect } from "react"
+import styled, { keyframes } from "styled-components"
+import { type ReactNode, useEffect, useRef, useState } from "react"
+import { Text } from "./Text"
+import { ChevronDown } from "lucide-react"
 
 interface BottomSheetProps {
     title: string
@@ -16,20 +18,47 @@ export function BottomSheet({
     actions,
     onClose,
 }: BottomSheetProps) {
+    const [closing, setClosing] = useState(false)
+    const closedRef = useRef(false)
+
+    const handleClose = () => {
+        if (closing) return
+        setClosing(true)
+    }
+
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose()
+            if (e.key === "Escape") handleClose()
         }
         window.addEventListener("keydown", handleEsc)
         return () => window.removeEventListener("keydown", handleEsc)
-    }, [onClose])
+    }, [])
 
     return (
-        <Overlay onClick={onClose}>
-            <Sheet onClick={(e) => e.stopPropagation()}>
+        <Overlay $closing={closing} onClick={handleClose}>
+            <Sheet
+                $closing={closing}
+                onClick={(e) => e.stopPropagation()}
+                onAnimationEnd={() => {
+                    if (closing && !closedRef.current) {
+                        closedRef.current = true
+                        onClose()
+                    }
+                }}
+            >
+                <Handle onClick={handleClose}>
+                    <ChevronDown size={24} />
+                </Handle>
+
                 <Header>
-                    <Title>{title}</Title>
-                    {caption && <Caption>{caption}</Caption>}
+                    <Text font="heading4" color="System.InverseSurface">
+                        {title}
+                    </Text>
+                    {caption && (
+                        <Text font="body2" color="Gray.SurfaceContainer">
+                            {caption}
+                        </Text>
+                    )}
                 </Header>
 
                 <Content>{children}</Content>
@@ -40,7 +69,17 @@ export function BottomSheet({
     )
 }
 
-const Overlay = styled.div`
+const slideUp = keyframes`
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+`
+
+const slideDown = keyframes`
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
+`
+
+const Overlay = styled.div<{ $closing: boolean }>`
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.45);
@@ -48,40 +87,35 @@ const Overlay = styled.div`
     display: flex;
     align-items: flex-end;
     z-index: 999;
+
+    pointer-events: ${({ $closing }) => ($closing ? "none" : "auto")};
 `
 
-const Sheet = styled.div`
+const Sheet = styled.div<{ $closing: boolean }>`
+    will-change: transform;
     width: 100%;
     border-radius: 20px 20px 0 0;
     background: ${({ theme }) => theme.colors.System.OnSurface};
-    padding: 24px;
-    animation: slideUp 0.25s ease-out;
+    padding: 16px 24px 24px;
 
-    @keyframes slideUp {
-        from {
-            transform: translateY(100%);
-        }
-        to {
-            transform: translateY(0);
-        }
-    }
+    animation: ${({ $closing }) => ($closing ? slideDown : slideUp)} 0.2s
+        ease-out;
+    animation-fill-mode: forwards;
+`
+
+const Handle = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 0 8px;
+    cursor: pointer;
+    color: ${({ theme }) => theme.colors.Gray.SurfaceContainer};
 `
 
 const Header = styled.div`
     margin-bottom: 20px;
-`
-
-const Title = styled.div`
-    font-size: 20px;
-    font-weight: 700;
-    color: ${({ theme }) => theme.colors.System.InverseSurface};
-`
-
-const Caption = styled.div`
-    margin-top: 4px;
-    font-size: 14px;
-    color: ${({ theme }) => theme.colors.System.InverseSurface};
-    opacity: 0.8;
+    display: flex;
+    flex-direction: column;
 `
 
 const Content = styled.div`
