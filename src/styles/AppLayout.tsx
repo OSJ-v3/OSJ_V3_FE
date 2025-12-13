@@ -10,6 +10,7 @@ export function AppLayout({ children }: IProps) {
         <Container>
             <AppScreen>
                 <Display>{children}</Display>
+                <div id="bottom-sheet-root" />
             </AppScreen>
         </Container>
     )
