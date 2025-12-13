@@ -40,6 +40,8 @@ const AppScreen = styled.div`
 
 const Display = styled.div`
     width: 90%;
+    box-sizing: border-box;
+    padding: 10px 0;
     display: flex;
     justify-content: center;
     align-items: start;
