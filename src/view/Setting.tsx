@@ -5,11 +5,21 @@ import { Text } from "../components/common/Text"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { Moon, Settings, Sun } from "lucide-react"
+import { useThemeStore } from "../stores/useThemeStore"
+import { BottomSheet } from "../components/common/BottomSheet"
+import { ModeItem } from "../components/items/ModeItem"
 
 export function Setting() {
     const theme = useTheme()
     const navigate = useNavigate()
-    const [mode] = useState<"light" | "dark" | "system">("dark")
+    const { mode, setMode } = useThemeStore()
+    const [open, setOpen] = useState<boolean>(false)
+
+    const icon = {
+        system: <Settings width={20} />,
+        light: <Sun width={20} />,
+        dark: <Moon width={20} />,
+    }[mode]
 
     return (
         <>
@@ -33,16 +43,10 @@ export function Setting() {
 
                     <SettingItem
                         title="모드 설정"
-                        onClick={() => console.log("")}
+                        onClick={() => setOpen(true)}
                     >
                         <div style={{ color: theme.colors.Main.Primary }}>
-                            {mode == "system" ? (
-                                <Settings width={20} />
-                            ) : mode == "light" ? (
-                                <Sun width={20} />
-                            ) : (
-                                <Moon width={20} />
-                            )}
+                            {icon}
                         </div>
                     </SettingItem>
 
@@ -52,6 +56,33 @@ export function Setting() {
                     />
                 </ItemWrapper>
             </Wrapper>
+
+            {open && (
+                <BottomSheet
+                    title="화면 모드 설정"
+                    caption="앱에서 보여질 모드를 선택해보세요."
+                    onClose={() => setOpen(false)}
+                >
+                    <ModeItem
+                        label="라이트 모드"
+                        value="light"
+                        current={mode}
+                        onSelect={setMode}
+                    />
+                    <ModeItem
+                        label="다크 모드"
+                        value="dark"
+                        current={mode}
+                        onSelect={setMode}
+                    />
+                    <ModeItem
+                        label="시스템 모드"
+                        value="system"
+                        current={mode}
+                        onSelect={setMode}
+                    />
+                </BottomSheet>
+            )}
         </>
     )
 }
