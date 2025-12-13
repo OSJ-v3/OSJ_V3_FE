@@ -24,6 +24,7 @@ const Container = styled.div`
 `
 
 const AppScreen = styled.div`
+    position: relative;
     width: 100%;
     max-width: 600px;
     min-height: 100vh;

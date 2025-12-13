@@ -80,10 +80,16 @@ const slideDown = keyframes`
 `
 
 const Overlay = styled.div<{ $closing: boolean }>`
-    position: fixed;
-    inset: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+
     background: rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(2px);
+
     display: flex;
     align-items: flex-end;
     z-index: 999;
