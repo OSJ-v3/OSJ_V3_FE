@@ -6,17 +6,19 @@ import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { Moon, Settings, Sun } from "lucide-react"
 import { useThemeStore } from "../stores/useThemeStore"
-import { BottomSheet } from "../components/common/BottomSheet"
-import { ModeItem } from "../components/items/ModeItem"
 import { useAreaStore } from "../stores/useAreaStore"
+import { MainPage, StartPage, ThemeSetting } from "./BottomSheets"
+import { useStartStore } from "../stores/useStartStore"
 
 export function Setting() {
     const theme = useTheme()
     const navigate = useNavigate()
     const { mode, setMode } = useThemeStore()
-    const [open, setOpen] = useState<boolean>(false)
     const { area, setArea } = useAreaStore()
+    const { start, setStart } = useStartStore()
+    const [themeOpen, setThemeOpen] = useState<boolean>(false)
     const [areaOpen, setAreaOpen] = useState(false)
+    const [startOpen, setStartOpen] = useState<boolean>(false)
 
     const icon = {
         system: <Settings width={20} />,
@@ -30,6 +32,15 @@ export function Setting() {
                 <Header title="설정" />
 
                 <ItemWrapper>
+                    <SettingItem
+                        title="메인 화면 설정"
+                        onClick={() => setStartOpen(true)}
+                    >
+                        <Text font={"subTitle2"} color="Main.Primary">
+                            {start == "mine" ? "내 세탁실" : "세탁실 현황"}
+                        </Text>
+                    </SettingItem>
+
                     <SettingItem
                         title="메인 세탁실 설정"
                         onClick={() => setAreaOpen(true)}
@@ -46,7 +57,7 @@ export function Setting() {
 
                     <SettingItem
                         title="모드 설정"
-                        onClick={() => setOpen(true)}
+                        onClick={() => setThemeOpen(true)}
                     >
                         <div style={{ color: theme.colors.Main.Primary }}>
                             {icon}
@@ -60,58 +71,28 @@ export function Setting() {
                 </ItemWrapper>
             </Wrapper>
 
-            {open && (
-                <BottomSheet
-                    title="화면 모드 설정"
-                    caption="앱에서 보여질 모드를 선택해보세요."
-                    onClose={() => setOpen(false)}
-                >
-                    <ModeItem
-                        label="라이트 모드"
-                        value="light"
-                        current={mode}
-                        onSelect={setMode}
-                    />
-                    <ModeItem
-                        label="다크 모드"
-                        value="dark"
-                        current={mode}
-                        onSelect={setMode}
-                    />
-                    <ModeItem
-                        label="시스템 모드"
-                        value="system"
-                        current={mode}
-                        onSelect={setMode}
-                    />
-                </BottomSheet>
+            {startOpen && (
+                <StartPage
+                    value={start}
+                    onChange={(v) => setStart(v)}
+                    onClose={() => setStartOpen(false)}
+                />
             )}
 
             {areaOpen && (
-                <BottomSheet
-                    title="메인 세탁실 설정"
-                    caption="기본으로 보여질 세탁실을 선택하세요."
+                <MainPage
+                    value={area}
+                    onChange={(v) => setArea(v)}
                     onClose={() => setAreaOpen(false)}
-                >
-                    <ModeItem
-                        label="남자 학교측"
-                        value="남자 학교측"
-                        current={area}
-                        onSelect={(v) => setArea(v)}
-                    />
-                    <ModeItem
-                        label="남자 기숙사측"
-                        value="남자 기숙사측"
-                        current={area}
-                        onSelect={(v) => setArea(v)}
-                    />
-                    <ModeItem
-                        label="여자"
-                        value="여자"
-                        current={area}
-                        onSelect={(v) => setArea(v)}
-                    />
-                </BottomSheet>
+                />
+            )}
+
+            {themeOpen && (
+                <ThemeSetting
+                    value={mode}
+                    onChange={(v) => setMode(v)}
+                    onClose={() => setThemeOpen(false)}
+                />
             )}
         </>
     )
