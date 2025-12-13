@@ -4,9 +4,11 @@ import styled from "styled-components"
 import { Text } from "../components/common/Text"
 import { Device } from "../components/items/Device"
 import { Status } from "./Devices/Status"
+import { useStartStore } from "../stores/useStartStore"
 
 export function Main() {
-    const [tab, setTab] = useState<"mine" | "status">("mine")
+    const { start } = useStartStore()
+    const [tab, setTab] = useState<"mine" | "status">(start)
 
     const dummyDevices = [
         { id: 1, type: "WASH", state: 0 },
