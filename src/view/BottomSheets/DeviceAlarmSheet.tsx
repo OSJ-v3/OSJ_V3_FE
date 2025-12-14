@@ -20,7 +20,7 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
     if (isAlarmed) {
         return (
             <BottomSheet
-                title={`${device.id}번 ${deviceName}의 알림 설정을 해제하실 건가요?`}
+                title={`${device.id}번${deviceName}의\n알림 설정을 해제하실 건가요?`}
                 caption="알림 설정을 해제하시면 종료 알림을 받으실 수 없습니다."
                 onClose={onClose}
                 actions={
@@ -45,7 +45,7 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
     if (device.state === 0) {
         return (
             <BottomSheet
-                title={`${device.id}번 ${deviceName}의 알림을 설정할까요?`}
+                title={`${device.id}번 ${deviceName}의\n알림을 설정할까요?`}
                 caption={`${deviceName}가 종료되면 알림을 드릴게요.`}
                 onClose={onClose}
                 actions={
