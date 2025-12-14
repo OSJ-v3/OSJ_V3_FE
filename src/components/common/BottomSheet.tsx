@@ -1,8 +1,14 @@
-import styled, { keyframes } from "styled-components"
-import { type ReactNode, useEffect, useRef, useState } from "react"
-import { Text } from "./Text"
-import { ChevronDown } from "lucide-react"
+import styled from "styled-components"
+import {
+    type ReactNode,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from "react"
 import { createPortal } from "react-dom"
+import { ChevronDown } from "lucide-react"
+import { Text } from "./Text"
 
 interface BottomSheetProps {
     title: string
@@ -19,29 +25,31 @@ export function BottomSheet({
     actions,
     onClose,
 }: BottomSheetProps) {
-    const [top, setTop] = useState(0)
+    const [mounted, setMounted] = useState(false)
     const [closing, setClosing] = useState(false)
     const closedRef = useRef(false)
+    const scrollYRef = useRef(0)
 
     const handleClose = () => {
         if (closing) return
         setClosing(true)
     }
 
-    useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === "Escape") handleClose()
-        }
-        window.addEventListener("keydown", handleEsc)
-        return () => window.removeEventListener("keydown", handleEsc)
+    useLayoutEffect(() => {
+        setMounted(true)
     }, [])
 
     useEffect(() => {
-        setTop(window.scrollY)
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") handleClose()
+        }
+        window.addEventListener("keydown", onKeyDown)
+        return () => window.removeEventListener("keydown", onKeyDown)
     }, [])
 
     useEffect(() => {
         const scrollY = window.scrollY
+        scrollYRef.current = scrollY
 
         document.body.style.position = "fixed"
         document.body.style.top = `-${scrollY}px`
@@ -55,8 +63,7 @@ export function BottomSheet({
             document.body.style.left = ""
             document.body.style.right = ""
             document.body.style.width = ""
-
-            window.scrollTo(0, scrollY)
+            window.scrollTo(0, scrollYRef.current)
         }
     }, [])
 
@@ -64,11 +71,12 @@ export function BottomSheet({
     if (!portalRoot) return null
 
     return createPortal(
-        <Overlay $top={top} $closing={closing} onClick={handleClose}>
+        <Overlay onClick={handleClose}>
             <Sheet
+                $mounted={mounted}
                 $closing={closing}
                 onClick={(e) => e.stopPropagation()}
-                onAnimationEnd={() => {
+                onTransitionEnd={() => {
                     if (closing && !closedRef.current) {
                         closedRef.current = true
                         onClose()
@@ -99,26 +107,9 @@ export function BottomSheet({
     )
 }
 
-const slideUp = keyframes`
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-`
-
-const slideDown = keyframes`
-    from { transform: translateY(0); }
-    to { transform: translateY(100%); }
-`
-
-const Overlay = styled.div<{
-    $closing: boolean
-    $top: number
-}>`
+const Overlay = styled.div`
     position: absolute;
-    left: 0;
-    right: 0;
-    top: ${({ $top }) => `${$top}px`};
-    height: 100vh;
-    overflow: hidden;
+    inset: 0;
 
     background: rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(2px);
@@ -128,16 +119,19 @@ const Overlay = styled.div<{
     z-index: 999;
 `
 
-const Sheet = styled.div<{ $closing: boolean }>`
-    will-change: transform;
+const Sheet = styled.div<{ $mounted: boolean; $closing: boolean }>`
     width: 100%;
     border-radius: 20px 20px 0 0;
     background: ${({ theme }) => theme.colors.System.OnSurface};
     padding: 16px 24px 24px;
 
-    animation: ${({ $closing }) => ($closing ? slideDown : slideUp)} 0.2s
-        ease-out;
-    animation-fill-mode: forwards;
+    transform: translateY(
+        ${({ $mounted, $closing }) =>
+            $closing ? "100%" : $mounted ? "0%" : "100%"}
+    );
+
+    transition: transform 0.2s ease-out;
+    will-change: transform;
 `
 
 const Handle = styled.div`
