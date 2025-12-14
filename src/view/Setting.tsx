@@ -51,11 +51,6 @@ export function Setting() {
                     </SettingItem>
 
                     <SettingItem
-                        title="알림음 설정"
-                        onClick={() => console.log("")}
-                    />
-
-                    <SettingItem
                         title="모드 설정"
                         onClick={() => setThemeOpen(true)}
                     >
