@@ -6,8 +6,11 @@ import { Device } from "../components/items/Device"
 import { Status } from "./Devices/Status"
 import { useStartStore } from "../stores/useStartStore"
 import { useAlarmStore } from "../stores/useAlarmStore"
+// import { useNetworkStore } from "../stores/useNetworkStore"
+// import { NetworkError } from "../components/common/NetworkError"
 
 export function Main() {
+    // const online = useNetworkStore((s) => s.online)
     const { start } = useStartStore()
     const { alarms } = useAlarmStore()
     const [tab, setTab] = useState<"mine" | "status">(start)
@@ -53,15 +56,15 @@ export function Main() {
         touchStartX.current = null
     }
 
+    // if (!online) {
+    //     return <NetworkError />
+    // }
+
     return (
-        <Wrapper>
+        <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <HeaderTabBar value={tab} onChange={setTab} />
 
-            <SlideContainer
-                onTouchStart={onTouchStart}
-                onTouchEnd={onTouchEnd}
-                $height={height}
-            >
+            <SlideContainer $height={height}>
                 <SlideTrack $tab={tab}>
                     <SlidePage ref={mineRef}>
                         <TextContainer>
@@ -102,7 +105,7 @@ const SlideContainer = styled.div<{ $height: number }>`
     width: 100%;
     overflow: hidden;
     height: ${({ $height }) => `${$height}px`};
-    transition: height 0.25s ease;
+    transition: height 0.2s ease;
 `
 
 const SlideTrack = styled.div<{ $tab: "mine" | "status" }>`
@@ -126,6 +129,8 @@ const SlidePage = styled.div`
 
 const Wrapper = styled.div`
     width: 100%;
+    min-height: calc(100dvh - 20px);
+    touch-action: pan-y;
     display: flex;
     justify-content: start;
     align-items: start;

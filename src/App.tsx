@@ -14,8 +14,11 @@ import { ToastProvider } from "./contexts/ToastContext"
 import { ToastRenderer } from "./components/common/ToastRenderer"
 import { AlarmProvider } from "./contexts/AlarmContext"
 import { AlarmRenderer } from "./components/common/AlarmRenderer"
+// import { useNetworkListener } from "./hooks/useNetworkListener"
 
 function App() {
+    // useNetworkListener()
+
     useEffect(() => {
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.getRegistrations().then((regs) => {
