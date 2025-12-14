@@ -7,9 +7,10 @@ interface IProps {
     type: "WASH" | "DRY"
     state: 0 | 1 | 2 | 3
     size?: "medium" | "large"
+    onClick?: () => void
 }
 
-export function Icon({ id, type, state, size = "medium" }: IProps) {
+export function Icon({ id, type, state, size = "medium", onClick }: IProps) {
     const theme = useTheme()
 
     const getStateColor = (theme: any, state: 0 | 1 | 2 | 3) => {
@@ -46,7 +47,11 @@ export function Icon({ id, type, state, size = "medium" }: IProps) {
     const IconComponent = type === "WASH" ? WashIcon : DryIcon
 
     return (
-        <Wrapper size={size} $background={stateColor.background}>
+        <Wrapper
+            size={size}
+            $background={stateColor.background}
+            onClick={onClick}
+        >
             <IconComponent
                 style={{ color: stateColor.icon }}
                 width={24}
