@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { persist } from "zustand/middleware"
 
 export type AlarmDevice = {
     id: number
@@ -12,18 +13,25 @@ interface AlarmStore {
     removeAlarm: (id: number) => void
 }
 
-export const useAlarmStore = create<AlarmStore>((set, get) => ({
-    alarms: [],
+export const useAlarmStore = create<AlarmStore>()(
+    persist(
+        (set, get) => ({
+            alarms: [],
 
-    hasAlarm: (id) => get().alarms.some((device) => device.id === id),
+            hasAlarm: (id) => get().alarms.some((device) => device.id === id),
 
-    addAlarm: (device) =>
-        set((state) => ({
-            alarms: [...state.alarms, device],
-        })),
+            addAlarm: (device) =>
+                set((state) => ({
+                    alarms: [...state.alarms, device],
+                })),
 
-    removeAlarm: (id) =>
-        set((state) => ({
-            alarms: state.alarms.filter((d) => d.id !== id),
-        })),
-}))
+            removeAlarm: (id) =>
+                set((state) => ({
+                    alarms: state.alarms.filter((d) => d.id !== id),
+                })),
+        }),
+        {
+            name: "alarm-store",
+        }
+    )
+)
