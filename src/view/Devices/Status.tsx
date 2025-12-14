@@ -12,9 +12,9 @@ export function Status() {
     return (
         <>
             <AreaSelector value={present} onChange={setPresent} />
-            {area == "남자 학교측" && <MaleSchool />}
-            {area == "남자 기숙사측" && <MaleDorm />}
-            {area == "여자" && <Female />}
+            {present == "남자 학교측" && <MaleSchool />}
+            {present == "남자 기숙사측" && <MaleDorm />}
+            {present == "여자" && <Female />}
         </>
     )
 }
