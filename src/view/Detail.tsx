@@ -14,7 +14,6 @@ export function Detail() {
     const day = String(+today.getDate() + Number(id)).padStart(2, "0")
 
     const formattedDate = `${year}-${month}-${day}`
-    console.log(formattedDate)
 
     const content = `
 ## 공지 안내
