@@ -1,6 +1,7 @@
 import { BottomSheet } from "../../components/common/BottomSheet"
 import { Button } from "../../components/common/Button"
 import { useAlarmStore } from "../../stores/useAlarmStore"
+import { useToastContext } from "../../contexts/ToastContext"
 
 interface Props {
     device: {
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function DeviceAlarmSheet({ device, onClose }: Props) {
+    const { showToast } = useToastContext()
     const { hasAlarm, addAlarm, removeAlarm } = useAlarmStore()
     const isAlarmed = hasAlarm(device.id)
 
@@ -31,6 +33,12 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
                         <Button
                             onClick={() => {
                                 removeAlarm(device.id)
+
+                                showToast(
+                                    `${deviceName} 알림이 해제되었습니다.`,
+                                    "success"
+                                )
+
                                 onClose()
                             }}
                         >
@@ -59,6 +67,12 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
                                     id: device.id,
                                     type: device.type,
                                 })
+
+                                showToast(
+                                    `${deviceName} 알림 설정이 완료되었습니다.`,
+                                    "success"
+                                )
+
                                 onClose()
                             }}
                         >

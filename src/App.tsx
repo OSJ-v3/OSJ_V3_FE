@@ -10,6 +10,8 @@ import { Splash } from "./components/common/Splash"
 import { useEffect } from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { Complain, Detail, Main, Notice, Setting } from "./view"
+import { ToastProvider } from "./contexts/ToastContext"
+import { ToastRenderer } from "./components/common/ToastRenderer"
 
 function App() {
     useEffect(() => {
@@ -37,17 +39,22 @@ function App() {
     return (
         <BrowserRouter>
             <ThemeProvider theme={appliedTheme}>
-                <Splash />
-                <GlobalStyle />
-                <AppLayout>
-                    <Routes>
-                        <Route path="/" element={<Main />} />
-                        <Route path="/notice" element={<Notice />} />
-                        <Route path="/setting" element={<Setting />} />
-                        <Route path="/complain" element={<Complain />} />
-                        <Route path="/notice/:id" element={<Detail />} />
-                    </Routes>
-                </AppLayout>
+                <ToastProvider>
+                    <Splash />
+                    <GlobalStyle />
+
+                    <ToastRenderer />
+
+                    <AppLayout>
+                        <Routes>
+                            <Route path="/" element={<Main />} />
+                            <Route path="/notice" element={<Notice />} />
+                            <Route path="/setting" element={<Setting />} />
+                            <Route path="/complain" element={<Complain />} />
+                            <Route path="/notice/:id" element={<Detail />} />
+                        </Routes>
+                    </AppLayout>
+                </ToastProvider>
             </ThemeProvider>
         </BrowserRouter>
     )
