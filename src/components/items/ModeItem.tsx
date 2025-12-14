@@ -19,7 +19,7 @@ export function ModeItem<T extends string>({
     const selected = value === current
 
     return (
-        <Container $selected={selected} onClick={() => onSelect(value)}>
+        <Container onClick={() => onSelect(value)}>
             <Text font={"button1"} color="System.InverseSurface">
                 {label}
             </Text>
@@ -34,7 +34,7 @@ export function ModeItem<T extends string>({
     )
 }
 
-const Container = styled.div<{ $selected: boolean }>`
+const Container = styled.div`
     padding: 14px 16px;
     border-radius: 12px;
     cursor: pointer;
