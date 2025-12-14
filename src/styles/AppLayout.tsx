@@ -10,6 +10,8 @@ export function AppLayout({ children }: IProps) {
         <Container>
             <AppScreen>
                 <Display>{children}</Display>
+
+                <div id="bottom-sheet-root" />
             </AppScreen>
         </Container>
     )
@@ -35,15 +37,14 @@ const AppScreen = styled.div`
 
     display: flex;
     justify-content: center;
-    align-items: start;
+    align-items: flex-start;
 `
 
 const Display = styled.div`
     width: 90%;
-    box-sizing: border-box;
     padding: 10px 0;
+    box-sizing: border-box;
+
     display: flex;
-    justify-content: center;
-    align-items: start;
     flex-direction: column;
 `

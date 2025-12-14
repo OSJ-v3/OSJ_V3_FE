@@ -5,16 +5,12 @@ import { Text } from "../components/common/Text"
 import { Device } from "../components/items/Device"
 import { Status } from "./Devices/Status"
 import { useStartStore } from "../stores/useStartStore"
+import { useAlarmStore } from "../stores/useAlarmStore"
 
 export function Main() {
     const { start } = useStartStore()
+    const { alarms } = useAlarmStore()
     const [tab, setTab] = useState<"mine" | "status">(start)
-
-    const dummyDevices = [
-        { id: 1, type: "WASH", state: 0 },
-        { id: 2, type: "DRY", state: 2 },
-        { id: 3, type: "DRY", state: 1 },
-    ]
 
     return (
         <>
@@ -37,12 +33,12 @@ export function Main() {
                         </TextContainer>
 
                         <DeviceGrid>
-                            {dummyDevices.map((d) => (
+                            {alarms.map((d) => (
                                 <Device
                                     key={`${d.type}-${d.id}`}
                                     id={d.id}
-                                    type={d.type as "WASH" | "DRY"}
-                                    state={d.state as 0 | 1 | 2 | 3}
+                                    type={d.type}
+                                    state={0}
                                 />
                             ))}
                         </DeviceGrid>

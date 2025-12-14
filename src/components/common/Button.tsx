@@ -17,10 +17,10 @@ type Props = ComponentProps<"button"> & {
 export const Button = ({
     kind = "primary",
     full = true,
-    height = 48,
+    height = 44,
     width,
     padding = "8px 16px",
-    borderRadius = 12,
+    borderRadius = 8,
     border,
     style,
     children,

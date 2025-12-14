@@ -2,6 +2,8 @@ import Wahser from "../../assets/icons/washer.png"
 import Dryer from "../../assets/icons/dryer.png"
 import { Text, type ColorKey } from "../common/Text"
 import styled, { useTheme } from "styled-components"
+import { useState } from "react"
+import { DeviceAlarmSheet } from "../../view/BottomSheets/DeviceAlarmSheet"
 
 interface IProps {
     id: number
@@ -11,6 +13,11 @@ interface IProps {
 
 export function Device({ id, type, state }: IProps) {
     const theme = useTheme()
+    const [selected, setSelected] = useState<null | {
+        id: number
+        type: "WASH" | "DRY"
+        state: 0 | 1 | 2 | 3
+    }>(null)
 
     const getStateColor = (
         theme: any,
@@ -58,7 +65,10 @@ export function Device({ id, type, state }: IProps) {
 
     return (
         <>
-            <Wrapper $border={stateColor.background}>
+            <Wrapper
+                $border={stateColor.background}
+                onClick={() => setSelected({ id, type, state })}
+            >
                 <img width={120} src={type === "WASH" ? Wahser : Dryer} />
                 <Text font={"subTitle2"}>
                     {id}번 {type === "WASH" ? "세탁기" : "건조기"}
@@ -70,6 +80,13 @@ export function Device({ id, type, state }: IProps) {
                     </Text>
                 </StateText>
             </Wrapper>
+
+            {selected && (
+                <DeviceAlarmSheet
+                    device={selected}
+                    onClose={() => setSelected(null)}
+                />
+            )}
         </>
     )
 }
