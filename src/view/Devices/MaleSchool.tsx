@@ -2,7 +2,11 @@ import { DeviceLayout } from "../../components/main/device/DeviceLayout"
 import type { DeviceData } from "../../components/main/device/type"
 import { maleSchoolLayout } from "../../layouts/maleSchool"
 
-export function MaleSchool() {
+interface Props {
+    forceSkeleton?: boolean
+}
+
+export function MaleSchool({ forceSkeleton }: Props) {
     const maleSchoolDummyDevices: DeviceData[] = maleSchoolLayout
         .flat()
         .filter((c) => c.type !== "empty")
@@ -27,7 +31,7 @@ export function MaleSchool() {
         <>
             <DeviceLayout
                 layout={maleSchoolLayout}
-                devices={maleSchoolDummyDevices}
+                devices={forceSkeleton ? [] : maleSchoolDummyDevices}
             />
         </>
     )

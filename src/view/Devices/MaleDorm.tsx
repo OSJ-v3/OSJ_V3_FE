@@ -2,7 +2,11 @@ import { DeviceLayout } from "../../components/main/device/DeviceLayout"
 import type { DeviceData } from "../../components/main/device/type"
 import { maleDormLayout } from "../../layouts/maleDorm"
 
-export function MaleDorm() {
+interface Props {
+    forceSkeleton?: boolean
+}
+
+export function MaleDorm({ forceSkeleton }: Props) {
     const maleDormDummyDevices: DeviceData[] = maleDormLayout
         .flat()
         .filter((c) => c.type !== "empty")
@@ -27,7 +31,7 @@ export function MaleDorm() {
         <>
             <DeviceLayout
                 layout={maleDormLayout}
-                devices={maleDormDummyDevices}
+                devices={forceSkeleton ? [] : maleDormDummyDevices}
             />
         </>
     )
