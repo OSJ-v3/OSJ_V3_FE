@@ -5,7 +5,7 @@ interface LayoutCell {
     col: number
     device?: {
         id: number
-        type: "WASH" | "DRY" | "WATER"
+        type: "WASH" | "DRY"
     }
 }
 

@@ -25,7 +25,7 @@ export function DeviceColumn({ cells, devices }: Props) {
                 return (
                     <PairBox key={idx}>
                         <DeviceItem device={devices[cell.devices[0].id]} />
-                        <Spacer />
+
                         <DeviceItem device={devices[cell.devices[1].id]} />
                     </PairBox>
                 )
@@ -43,11 +43,7 @@ const Col = styled.div`
 
 const PairBox = styled.div`
     display: flex;
-    gap: 8px;
-`
-
-const Spacer = styled.div`
-    width: 8px;
+    gap: 12px;
 `
 
 const Empty = styled.div`

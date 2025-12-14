@@ -2,7 +2,11 @@ import { DeviceLayout } from "../../components/main/device/DeviceLayout"
 import type { DeviceData } from "../../components/main/device/type"
 import { femaleLayout } from "../../layouts/female"
 
-export function Female() {
+interface Props {
+    forceSkeleton?: boolean
+}
+
+export function Female({ forceSkeleton }: Props) {
     const femaleDummyDevices: DeviceData[] = femaleLayout
         .flat()
         .filter((c) => c.type !== "empty")
@@ -24,8 +28,9 @@ export function Female() {
         })
 
     return (
-        <>
-            <DeviceLayout layout={femaleLayout} devices={femaleDummyDevices} />
-        </>
+        <DeviceLayout
+            layout={femaleLayout}
+            devices={forceSkeleton ? [] : femaleDummyDevices}
+        />
     )
 }
