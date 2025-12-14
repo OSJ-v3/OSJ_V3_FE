@@ -108,14 +108,19 @@ export function BottomSheet({
 }
 
 const Overlay = styled.div`
-    position: absolute;
+    margin: auto;
+    max-width: 600px;
+    width: 100%;
+    position: fixed;
     inset: 0;
 
     background: rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(2px);
 
     display: flex;
+    justify-content: center;
     align-items: flex-end;
+
     z-index: 999;
 `
 
