@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useLayoutEffect, useRef, useState } from "react"
 import { HeaderTabBar } from "../components/main/HeaderTabBar"
 import styled from "styled-components"
 import { Text } from "../components/common/Text"
@@ -6,12 +6,30 @@ import { Device } from "../components/items/Device"
 import { Status } from "./Devices/Status"
 import { useStartStore } from "../stores/useStartStore"
 import { useAlarmStore } from "../stores/useAlarmStore"
-import { useRef } from "react"
 
 export function Main() {
     const { start } = useStartStore()
     const { alarms } = useAlarmStore()
     const [tab, setTab] = useState<"mine" | "status">(start)
+    const mineRef = useRef<HTMLDivElement>(null)
+    const statusRef = useRef<HTMLDivElement>(null)
+    const [height, setHeight] = useState<number>(0)
+
+    useLayoutEffect(() => {
+        const target = tab === "mine" ? mineRef.current : statusRef.current
+        if (!target) return
+
+        const updateHeight = () => {
+            setHeight(target.scrollHeight)
+        }
+
+        updateHeight()
+
+        const observer = new ResizeObserver(updateHeight)
+        observer.observe(target)
+
+        return () => observer.disconnect()
+    }, [tab])
 
     const touchStartX = useRef<number | null>(null)
 
@@ -39,10 +57,13 @@ export function Main() {
         <Wrapper>
             <HeaderTabBar value={tab} onChange={setTab} />
 
-            <SlideContainer onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+            <SlideContainer
+                onTouchStart={onTouchStart}
+                onTouchEnd={onTouchEnd}
+                $height={height}
+            >
                 <SlideTrack $tab={tab}>
-                    {/* mine */}
-                    <SlidePage>
+                    <SlidePage ref={mineRef}>
                         <TextContainer>
                             <Text font="heading2">
                                 알림 설정한
@@ -68,7 +89,7 @@ export function Main() {
                         </DeviceGrid>
                     </SlidePage>
 
-                    <SlidePage>
+                    <SlidePage ref={statusRef}>
                         <Status />
                     </SlidePage>
                 </SlideTrack>
@@ -77,17 +98,19 @@ export function Main() {
     )
 }
 
-const SlideContainer = styled.div`
+const SlideContainer = styled.div<{ $height: number }>`
     width: 100%;
     overflow: hidden;
+    height: ${({ $height }) => `${$height}px`};
+    transition: height 0.25s ease;
 `
 
 const SlideTrack = styled.div<{ $tab: "mine" | "status" }>`
     display: flex;
     width: 200%;
+    align-items: flex-start;
 
     transform: translateX(${({ $tab }) => ($tab === "mine" ? "0%" : "-50%")});
-
     transition: transform 0.2s ease-out;
 `
 
