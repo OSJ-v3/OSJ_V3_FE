@@ -34,6 +34,7 @@ const StyledText = styled.span<{
     $font: fontsKeyOfType
     $color: ColorKey
 }>`
+    white-space: pre-line;
     ${({ $font }) => fontToCss($font)};
     color: ${({ theme, $color }) => {
         const colors = theme.colors as DefaultTheme["colors"]
