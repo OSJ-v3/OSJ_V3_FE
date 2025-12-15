@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom"
 import styled, { css } from "styled-components"
-import { Header } from "../components/main/Header"
-import { Text } from "../components/common/Text"
+import { Header, Text } from "../components"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 

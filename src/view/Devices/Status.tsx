@@ -1,9 +1,9 @@
-import { AreaSelector } from "../../components/main/AreaSelector"
+import { useEffect, useState } from "react"
 import { Female } from "./Female"
 import { MaleDorm } from "./MaleDorm"
 import { MaleSchool } from "./MaleSchool"
+import { AreaSelector } from "../../components"
 import { useAreaStore } from "../../stores/useAreaStore"
-import { useEffect, useState } from "react"
 import { useMinSkeleton } from "../../hooks/useMinSkeleton"
 
 export function Status() {
@@ -13,7 +13,6 @@ export function Status() {
     const [isLoading, setIsLoading] = useState(false)
     const showSkeleton = useMinSkeleton(isLoading, 1000)
 
-    // 지금은 1초후 바로 false, 나중에 api 연동
     useEffect(() => {
         setIsLoading(true)
 

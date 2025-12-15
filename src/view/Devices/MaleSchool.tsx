@@ -1,5 +1,4 @@
-import { DeviceLayout } from "../../components/main/device/DeviceLayout"
-import type { DeviceData } from "../../components/main/device/type"
+import { DeviceLayout, type DeviceData } from "../../components"
 import { maleSchoolLayout } from "../../layouts/maleSchool"
 
 interface Props {
