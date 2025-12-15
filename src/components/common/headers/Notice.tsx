@@ -1,12 +1,11 @@
-import styled, { useTheme } from "styled-components"
-import { BellIcon } from "../../../assets/icons/bell"
+import { BellIcon } from "../../../assets"
 import { useNavigate } from "react-router-dom"
+import styled, { useTheme } from "styled-components"
 
 export function Notice() {
     const theme = useTheme()
     const navigate = useNavigate()
 
-    // 읽지 않은 알림 여부
     const hasUnread = true
 
     return (

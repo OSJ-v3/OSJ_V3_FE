@@ -1,8 +1,7 @@
-import styled, { useTheme } from "styled-components"
-import { LaundryTabSwitch } from "./tapbar/LaundryTabSwitch"
-import { Notice } from "./tapbar/Notice"
-import { SettingIcon } from "../../assets/icons/setting"
 import { useNavigate } from "react-router-dom"
+import styled, { useTheme } from "styled-components"
+import { SettingIcon } from "../../../assets"
+import { LaundryTabSwitch, Notice } from ".."
 
 type Option = "mine" | "status"
 

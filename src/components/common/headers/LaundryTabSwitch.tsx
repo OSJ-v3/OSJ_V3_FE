@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components"
-import { Text } from "../../common/Text"
+import { Text } from "../Text"
 
 type Option = "mine" | "status"
 

@@ -1,5 +1,5 @@
 import styled, { useTheme } from "styled-components"
-import { Text } from "../common/Text"
+import { Text } from "../Text"
 
 type AreaType = "남자 학교측" | "남자 기숙사측" | "여자"
 

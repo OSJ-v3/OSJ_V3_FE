@@ -1,7 +1,7 @@
-import styled, { useTheme } from "styled-components"
-import { useNavigate } from "react-router-dom"
-import { Text } from "../common/Text"
 import { ChevronLeft } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import styled, { useTheme } from "styled-components"
+import { Text } from "../Text"
 
 interface Props {
     title?: string
