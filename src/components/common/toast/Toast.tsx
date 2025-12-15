@@ -1,8 +1,7 @@
-import type { ReactNode } from "react"
 import { CircleCheck, CircleAlert, Info } from "lucide-react"
-import type { DefaultTheme } from "styled-components"
-import styled, { useTheme } from "styled-components"
-import { Text } from "./Text"
+import type { ReactNode } from "react"
+import styled, { type DefaultTheme, useTheme } from "styled-components"
+import { Text } from "../Text"
 
 export type ToastType = "success" | "error" | "info"
 

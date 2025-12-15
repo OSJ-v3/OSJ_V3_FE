@@ -1,5 +1,5 @@
+import { useToastContext } from "../../../contexts"
 import { Toast } from "./Toast"
-import { useToastContext } from "../../contexts/ToastContext"
 
 export function ToastRenderer() {
     const { toast, visible } = useToastContext()
