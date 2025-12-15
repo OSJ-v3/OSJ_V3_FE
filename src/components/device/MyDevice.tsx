@@ -1,9 +1,7 @@
-import Wahser from "../../assets/icons/washer.png"
-import Dryer from "../../assets/icons/dryer.png"
-import { Text, type ColorKey } from "../common/Text"
+import { Text, type ColorKey, DeviceAlarmSheet } from ".."
 import styled, { useTheme } from "styled-components"
 import { useState } from "react"
-import { DeviceAlarmSheet } from "../../view/BottomSheets/DeviceAlarmSheet"
+import { Images } from "../../assets"
 
 interface IProps {
     id: number
@@ -11,7 +9,7 @@ interface IProps {
     state: 0 | 1 | 2 | 3
 }
 
-export function Device({ id, type, state }: IProps) {
+export function MyDevice({ id, type, state }: IProps) {
     const theme = useTheme()
     const [selected, setSelected] = useState<null | {
         id: number
@@ -69,7 +67,10 @@ export function Device({ id, type, state }: IProps) {
                 $border={stateColor.background}
                 onClick={() => setSelected({ id, type, state })}
             >
-                <img width={120} src={type === "WASH" ? Wahser : Dryer} />
+                <img
+                    width={120}
+                    src={type === "WASH" ? Images.Washer : Images.Dryer}
+                />
                 <Text font={"subTitle2"}>
                     {id}번 {type === "WASH" ? "세탁기" : "건조기"}
                 </Text>
@@ -100,7 +101,7 @@ const Wrapper = styled.div<{ $border: string }>`
     flex-direction: column;
     align-items: center;
     gap: 12px;
-    border: 1px solid ${({ $border }) => $border};
+    border: 1.5px solid ${({ $border }) => $border};
 `
 
 const StateText = styled.div<{ $background: string }>`
