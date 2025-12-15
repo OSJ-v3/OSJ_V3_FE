@@ -1,6 +1,5 @@
 import styled from "styled-components"
-import { DeviceItem } from "./DeviceItem"
-import type { DeviceData, LayoutCell } from "./type"
+import { DeviceItem, type DeviceData, type LayoutCell } from ".."
 
 interface Props {
     row: LayoutCell[]

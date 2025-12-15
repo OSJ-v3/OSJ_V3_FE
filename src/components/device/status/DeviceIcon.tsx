@@ -1,6 +1,6 @@
 import styled, { useTheme } from "styled-components"
-import { Text } from "../common/Text"
-import { WashIcon, DryIcon } from "../../assets/icons"
+import { WashIcon, DryIcon } from "../../../assets"
+import { Text } from "../../common"
 
 interface IProps {
     id: number
@@ -10,7 +10,13 @@ interface IProps {
     onClick?: () => void
 }
 
-export function Icon({ id, type, state, size = "medium", onClick }: IProps) {
+export function DeviceIcon({
+    id,
+    type,
+    state,
+    size = "medium",
+    onClick,
+}: IProps) {
     const theme = useTheme()
 
     const getStateColor = (theme: any, state: 0 | 1 | 2 | 3) => {

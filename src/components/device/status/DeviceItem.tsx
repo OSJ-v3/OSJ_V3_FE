@@ -1,7 +1,5 @@
-import type { DeviceData } from "./type"
-import { Icon } from "../../items"
 import { useState } from "react"
-import { DeviceAlarmSheet } from "../../../view/BottomSheets/DeviceAlarmSheet"
+import { DeviceIcon, type DeviceData, DeviceAlarmSheet } from "../.."
 
 interface Props {
     device?: DeviceData
@@ -17,7 +15,7 @@ export function DeviceItem({ device }: Props) {
 
     return (
         <>
-            <Icon
+            <DeviceIcon
                 id={device.id}
                 type={device.type}
                 state={device.state}

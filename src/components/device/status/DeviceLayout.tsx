@@ -1,9 +1,7 @@
+import { TriangleIcon } from "lucide-react"
 import styled, { useTheme } from "styled-components"
-import { TriangleIcon } from "../../../assets/icons/triangle"
-import { DeviceColumn } from "./DeviceColumn"
-import { SkeletonDeviceLayout } from "./SkeletonDeviceLayout"
-import { useMinSkeleton } from "../../../hooks/useMinSkeleton"
-import type { DeviceData } from "./type"
+import { useMinSkeleton } from "../../../hooks"
+import { SkeletonDeviceLayout, DeviceColumn, type DeviceData } from ".."
 
 interface Props {
     layout: any[]
