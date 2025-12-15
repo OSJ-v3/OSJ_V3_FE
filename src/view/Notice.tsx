@@ -1,7 +1,6 @@
-import styled from "styled-components"
-import { Header } from "../components/main/Header"
-import { NotcieItem } from "../components/items"
 import { useNavigate } from "react-router-dom"
+import styled from "styled-components"
+import { Header, NoticeItem } from "../components"
 
 export function Notice() {
     const navigate = useNavigate()
@@ -34,7 +33,7 @@ export function Notice() {
 
                 {notifications &&
                     notifications.map((v, i) => (
-                        <NotcieItem
+                        <NoticeItem
                             key={i}
                             title={v.title}
                             date={v.date}
