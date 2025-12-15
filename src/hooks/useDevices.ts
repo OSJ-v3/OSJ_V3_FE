@@ -1,12 +1,13 @@
-import { DeviceLayout, type DeviceData } from "../../components"
-import { femaleLayout } from "../../layouts/female"
+import type { DeviceData } from "../components"
+import type { LayoutCell } from "../components"
 
-interface Props {
+export function useDevices(
+    layout: LayoutCell[][],
     forceSkeleton?: boolean
-}
+): DeviceData[] {
+    if (forceSkeleton) return []
 
-export function Female({ forceSkeleton }: Props) {
-    const femaleDummyDevices: DeviceData[] = femaleLayout
+    return layout
         .flat()
         .filter((c) => c.type !== "empty")
         .flatMap((cell) => {
@@ -19,17 +20,11 @@ export function Female({ forceSkeleton }: Props) {
                     },
                 ]
             }
+
             return cell.devices.map((d) => ({
                 id: d.id,
                 type: d.deviceType,
                 state: Math.floor(Math.random() * 4) as 0 | 1 | 2 | 3,
             }))
         })
-
-    return (
-        <DeviceLayout
-            layout={femaleLayout}
-            devices={forceSkeleton ? [] : femaleDummyDevices}
-        />
-    )
 }
