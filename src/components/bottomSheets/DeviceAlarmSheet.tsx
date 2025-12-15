@@ -1,7 +1,6 @@
-import { BottomSheet } from "../../components/common/BottomSheet"
-import { Button } from "../../components/common/Button"
-import { useAlarmStore } from "../../stores/useAlarmStore"
-import { useToastContext } from "../../contexts/ToastContext"
+import { useToastContext } from "../../contexts"
+import { useAlarmStore } from "../../stores"
+import { BottomSheet, Button } from "../common"
 
 interface Props {
     device: {

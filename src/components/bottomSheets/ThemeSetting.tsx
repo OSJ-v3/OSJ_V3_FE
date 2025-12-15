@@ -1,5 +1,4 @@
-import { BottomSheet } from "../../components/common/BottomSheet"
-import { ModeItem } from "../../components/items/ModeItem"
+import { BottomSheet, ModeItem } from ".."
 
 export type ThemeMode = "light" | "dark" | "system"
 

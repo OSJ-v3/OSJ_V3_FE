@@ -1,5 +1,4 @@
-import { BottomSheet } from "../../components/common/BottomSheet"
-import { ModeItem } from "../../components/items/ModeItem"
+import { BottomSheet, ModeItem } from ".."
 
 type AreaType = "남자 학교측" | "남자 기숙사측" | "여자"
 

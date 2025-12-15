@@ -1,5 +1,4 @@
-import { BottomSheet } from "../../components/common/BottomSheet"
-import { ModeItem } from "../../components/items/ModeItem"
+import { BottomSheet, ModeItem } from ".."
 
 type PageType = "mine" | "status"
 
