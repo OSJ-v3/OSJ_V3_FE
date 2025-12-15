@@ -1,6 +1,5 @@
 import styled from "styled-components"
-import { Text } from "../common/Text"
-import { Button } from "../common/Button"
+import { Button, Text } from ".."
 
 interface Props {
     id: number

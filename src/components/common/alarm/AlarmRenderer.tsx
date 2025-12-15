@@ -1,7 +1,7 @@
+import { useEffect } from "react"
 import { createPortal } from "react-dom"
 import styled from "styled-components"
-import { useEffect } from "react"
-import { useAlarmContext } from "../../contexts/AlarmContext"
+import { useAlarmContext } from "../../../contexts"
 import { AlarmModal } from "./AlarmModal"
 
 export function AlarmRenderer() {
