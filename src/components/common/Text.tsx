@@ -1,9 +1,7 @@
 import type { ComponentProps } from "react"
-import styled from "styled-components"
-import type { DefaultTheme } from "styled-components"
-import type { fontsKeyOfType } from "../../styles/fonts"
-import { Fonts } from "../../styles/fonts"
-import type { Colors } from "../../styles/colors/lightColors"
+import styled, { type DefaultTheme } from "styled-components"
+import { type fontsKeyOfType, Fonts } from "../../styles"
+import type { Colors } from "../../types/theme"
 
 type MainKeys = keyof Colors["Main"]
 type GrayKeys = keyof Colors["Gray"]

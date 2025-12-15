@@ -1,13 +1,13 @@
-import styled from "styled-components"
+import { ChevronDown } from "lucide-react"
 import {
     type ReactNode,
-    useEffect,
-    useLayoutEffect,
-    useRef,
     useState,
+    useRef,
+    useLayoutEffect,
+    useEffect,
 } from "react"
 import { createPortal } from "react-dom"
-import { ChevronDown } from "lucide-react"
+import styled from "styled-components"
 import { Text } from "./Text"
 
 interface BottomSheetProps {

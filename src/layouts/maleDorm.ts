@@ -1,4 +1,4 @@
-import type { LayoutCell } from "../components/main/device/type"
+import type { LayoutCell } from "../components"
 
 export const maleDormLayout: LayoutCell[][] = [
     [

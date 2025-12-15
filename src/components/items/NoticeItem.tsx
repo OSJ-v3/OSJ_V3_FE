@@ -9,7 +9,7 @@ interface Props {
     onClick?: () => void
 }
 
-export function NotcieItem({ title, date, readed = false, onClick }: Props) {
+export function NoticeItem({ title, date, readed = false, onClick }: Props) {
     const theme = useTheme()
 
     return (

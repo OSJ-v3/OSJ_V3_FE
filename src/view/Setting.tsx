@@ -1,14 +1,16 @@
-import styled, { css, useTheme } from "styled-components"
-import { Header } from "../components/main/Header"
-import { SettingItem } from "../components/items"
-import { Text } from "../components/common/Text"
-import { useNavigate } from "react-router-dom"
+import { Settings, Sun, Moon } from "lucide-react"
 import { useState } from "react"
-import { Moon, Settings, Sun } from "lucide-react"
-import { useThemeStore } from "../stores/useThemeStore"
-import { useAreaStore } from "../stores/useAreaStore"
-import { MainPage, StartPage, ThemeSetting } from "./BottomSheets"
-import { useStartStore } from "../stores/useStartStore"
+import { useNavigate } from "react-router-dom"
+import styled, { useTheme, css } from "styled-components"
+import {
+    Header,
+    SettingItem,
+    StartPage,
+    MainPage,
+    ThemeSetting,
+    Text,
+} from "../components"
+import { useThemeStore, useAreaStore, useStartStore } from "../stores"
 
 export function Setting() {
     const theme = useTheme()

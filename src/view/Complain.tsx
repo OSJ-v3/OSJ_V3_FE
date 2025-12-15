@@ -1,8 +1,5 @@
 import { css, styled } from "styled-components"
-import { Header } from "../components/main/Header"
-import { Input } from "../components/common/Input"
-import { Button } from "../components/common/Button"
-import { Dropdown } from "../components/common/Dropdown"
+import { Header, Input, Button, Dropdown } from "../components"
 import { useState } from "react"
 
 export function Complain() {

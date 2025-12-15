@@ -1,11 +1,8 @@
 import { useLayoutEffect, useRef, useState } from "react"
-import { HeaderTabBar } from "../components/main/HeaderTabBar"
+import { HeaderTabBar, Text, MyDevice } from "../components"
 import styled from "styled-components"
-import { Text } from "../components/common/Text"
-import { Device } from "../components/items/Device"
-import { Status } from "./Devices/Status"
-import { useStartStore } from "../stores/useStartStore"
-import { useAlarmStore } from "../stores/useAlarmStore"
+import { Status } from "./Status"
+import { useStartStore, useAlarmStore } from "../stores"
 // import { useNetworkStore } from "../stores/useNetworkStore"
 // import { NetworkError } from "../components/common/NetworkError"
 
@@ -82,7 +79,7 @@ export function Main() {
 
                         <DeviceGrid>
                             {alarms.map((d) => (
-                                <Device
+                                <MyDevice
                                     key={`${d.type}-${d.id}`}
                                     id={d.id}
                                     type={d.type}

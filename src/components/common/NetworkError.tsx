@@ -1,6 +1,6 @@
 import styled, { useTheme } from "styled-components"
+import { DisconnectIcon } from "../../assets"
 import { Text } from "./Text"
-import { DisconnectIcon } from "../../assets/icons/disconnect"
 
 export function NetworkError() {
     const theme = useTheme()

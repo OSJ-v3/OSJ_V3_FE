@@ -1,9 +1,8 @@
+import { useState, useEffect } from "react"
 import styled, { keyframes } from "styled-components"
-import { useEffect, useState } from "react"
-import { useSystemTheme } from "../../hooks/useSystemTheme"
-import { useThemeStore } from "../../stores/useThemeStore"
-import darkLogo from "/splash/logo-dark.png"
-import lightLogo from "/splash/logo-light.png"
+import { useSystemTheme } from "../../hooks"
+import { useThemeStore } from "../../stores"
+import { Logos } from "../../assets"
 
 export function Splash() {
     const { mode } = useThemeStore()
@@ -19,7 +18,7 @@ export function Splash() {
 
     const currentTheme = mode === "system" ? systemTheme : mode
 
-    const logo = currentTheme === "dark" ? darkLogo : lightLogo
+    const logo = currentTheme === "dark" ? Logos.dark : Logos.light
 
     return (
         <Wrapper>
