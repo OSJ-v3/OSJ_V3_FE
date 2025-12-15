@@ -1,4 +1,4 @@
-import { useState, type ComponentProps, useRef, useEffect } from "react"
+import { type ComponentProps, useState, useRef, useEffect } from "react"
 import styled, { useTheme } from "styled-components"
 import { Text } from "./Text"
 

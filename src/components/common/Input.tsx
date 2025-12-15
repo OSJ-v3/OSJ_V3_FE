@@ -1,4 +1,4 @@
-import { type ComponentProps } from "react"
+import type { ComponentProps } from "react"
 import styled, { useTheme } from "styled-components"
 import { Text } from "./Text"
 
