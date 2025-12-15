@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react"
-import type { ToastType } from "../components/common/Toast"
+import type { ToastType } from "../components"
 
 export function useToast() {
     const [toast, setToast] = useState<{
