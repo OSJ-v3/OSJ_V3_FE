@@ -19,7 +19,8 @@ export function NetworkError() {
 }
 
 const Container = styled.div`
-    min-height: calc(100dvh - 20px);
+    width: 100%;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
