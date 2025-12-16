@@ -53,7 +53,7 @@ export function Setting() {
                     </SettingItem>
 
                     <SettingItem
-                        title="모드 설정"
+                        title="테마 설정"
                         onClick={() => setThemeOpen(true)}
                     >
                         <div style={{ color: theme.colors.Main.Primary }}>
