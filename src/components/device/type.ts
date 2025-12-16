@@ -1,5 +1,13 @@
 export type DeviceType = "WASH" | "DRY"
 
+type DeviceState = 0 | 1 | 2 | 3
+
+export interface RealDeviceData {
+    id: number
+    type: DeviceType
+    state: DeviceState
+}
+
 export interface DeviceData {
     id: number
     type: DeviceType

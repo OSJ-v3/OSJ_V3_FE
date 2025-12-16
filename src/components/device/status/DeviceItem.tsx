@@ -1,17 +1,34 @@
 import { useState } from "react"
-import { DeviceIcon, type DeviceData, DeviceAlarmSheet } from "../.."
+import {
+    DeviceIcon,
+    type DeviceData,
+    DeviceAlarmSheet,
+    type RealDeviceData,
+} from "../.."
 
 interface Props {
     device?: DeviceData
 }
 
+function isRealDevice(device: DeviceData): device is RealDeviceData {
+    return device.state !== "skeleton"
+}
+
 export function DeviceItem({ device }: Props) {
-    const [selected, setSelected] = useState<null | {
-        id: number
-        type: "WASH" | "DRY"
-        state: 0 | 1 | 2 | 3
-    }>(null)
+    const [selected, setSelected] = useState<RealDeviceData | null>(null)
+
     if (!device) return <div style={{ flex: 1 }} />
+
+    if (!isRealDevice(device)) {
+        return (
+            <DeviceIcon
+                id={device.id}
+                type={device.type}
+                state={0}
+                size="large"
+            />
+        )
+    }
 
     return (
         <>
