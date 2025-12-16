@@ -1,11 +1,13 @@
 import { create } from "zustand"
 
+export type NetworkStatus = "connecting" | "online" | "offline"
+
 interface NetworkState {
-    online: boolean
-    setOnline: (v: boolean) => void
+    status: NetworkStatus
+    setStatus: (status: NetworkStatus) => void
 }
 
 export const useNetworkStore = create<NetworkState>((set) => ({
-    online: true,
-    setOnline: (v) => set({ online: v }),
+    status: "connecting",
+    setStatus: (status) => set({ status }),
 }))

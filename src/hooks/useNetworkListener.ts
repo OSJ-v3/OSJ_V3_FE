@@ -1,24 +1,29 @@
 import { useEffect } from "react"
 import { useNetworkStore } from "../stores/useNetworkStore"
-import { checkInternet } from "../utils/checkInternet"
+import { checkSocket } from "../utils/checkSocket"
+
+const SOCKET_URL =
+    import.meta.env.WS_BASE_URL || "ws://10.113.100.157:8080/client"
 
 export function useNetworkListener() {
-    const setOnline = useNetworkStore((s) => s.setOnline)
+    const setStatus = useNetworkStore((s) => s.setStatus)
 
     useEffect(() => {
         let mounted = true
 
         const update = async () => {
-            const ok = await checkInternet()
-            if (mounted) setOnline(ok)
+            try {
+                const ok = await checkSocket(SOCKET_URL)
+                if (!mounted) return
+
+                setStatus(ok ? "online" : "offline")
+            } catch {
+                if (!mounted) return
+                setStatus("offline")
+            }
         }
 
-        const handleOnline = () => update()
-        const handleOffline = () => setOnline(false)
-
-        window.addEventListener("online", handleOnline)
-        window.addEventListener("offline", handleOffline)
-
+        setStatus("connecting")
         update()
 
         const interval = setInterval(update, 5000)
@@ -26,8 +31,6 @@ export function useNetworkListener() {
         return () => {
             mounted = false
             clearInterval(interval)
-            window.removeEventListener("online", handleOnline)
-            window.removeEventListener("offline", handleOffline)
         }
-    }, [setOnline])
+    }, [setStatus])
 }

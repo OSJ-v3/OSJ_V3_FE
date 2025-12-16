@@ -12,8 +12,8 @@ export function ThemeSetting({ value, onClose, onChange }: Props) {
     return (
         <>
             <BottomSheet
-                title="화면 모드 설정"
-                caption="앱에서 보여질 모드를 선택해보세요."
+                title="테마 설정"
+                caption="앱에서 사용할 테마 모드를 선택해보세요."
                 onClose={onClose}
             >
                 <ModeItem
