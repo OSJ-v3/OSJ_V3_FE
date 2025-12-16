@@ -1,19 +1,41 @@
-import { useLayoutEffect, useRef, useState } from "react"
-import { HeaderTabBar, Text, MyDevice } from "../components"
+import { useLayoutEffect, useRef, useState, useMemo } from "react"
+import {
+    HeaderTabBar,
+    Text,
+    MyDevice,
+    SkeletonMyDevice,
+    NetworkError,
+} from "../components"
 import styled from "styled-components"
 import { Status } from "./Status"
-import { useStartStore, useAlarmStore } from "../stores"
-// import { useNetworkStore } from "../stores/useNetworkStore"
-// import { NetworkError } from "../components/common/NetworkError"
+import { useStartStore, useAlarmStore, useNetworkStore } from "../stores"
+import {
+    useDeviceStatusSocket,
+    useMinSkeleton,
+    useNetworkRenderState,
+} from "../hooks"
 
 export function Main() {
-    // const online = useNetworkStore((s) => s.online)
     const { start } = useStartStore()
     const { alarms } = useAlarmStore()
+    const { status } = useNetworkStore()
     const [tab, setTab] = useState<"mine" | "status">(start)
     const mineRef = useRef<HTMLDivElement>(null)
     const statusRef = useRef<HTMLDivElement>(null)
     const [height, setHeight] = useState<number>(0)
+
+    const { states, loading, error } = useDeviceStatusSocket()
+    const stateMap = useMemo(
+        () => new Map(states.map((s) => [s.id, s.state])),
+        [states]
+    )
+    const showSkeleton = useMinSkeleton(loading, 500)
+
+    const renderState = useNetworkRenderState({
+        status,
+        loading,
+        showSkeleton,
+    })
 
     useLayoutEffect(() => {
         const target = tab === "mine" ? mineRef.current : statusRef.current
@@ -53,10 +75,6 @@ export function Main() {
         touchStartX.current = null
     }
 
-    // if (!online) {
-    //     return <NetworkError />
-    // }
-
     return (
         <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <HeaderTabBar value={tab} onChange={setTab} />
@@ -78,19 +96,37 @@ export function Main() {
                         </TextContainer>
 
                         <DeviceGrid>
-                            {alarms.map((d) => (
-                                <MyDevice
-                                    key={`${d.type}-${d.id}`}
-                                    id={d.id}
-                                    type={d.type}
-                                    state={0}
-                                />
-                            ))}
+                            {renderState === "idle" && null}
+
+                            {renderState === "skeleton" &&
+                                Array.from({ length: 6 }).map((_, i) => (
+                                    <SkeletonMyDevice key={i} />
+                                ))}
+
+                            {renderState === "error" && (
+                                <NetworkFill>
+                                    <NetworkError />
+                                </NetworkFill>
+                            )}
+
+                            {renderState === "content" &&
+                                alarms.map((d) => (
+                                    <MyDevice
+                                        key={`${d.type}-${d.id}`}
+                                        id={d.id}
+                                        type={d.type}
+                                        state={stateMap.get(d.id) ?? 2}
+                                    />
+                                ))}
                         </DeviceGrid>
                     </SlidePage>
 
                     <SlidePage ref={statusRef}>
-                        <Status />
+                        <Status
+                            states={states}
+                            loading={loading}
+                            error={error}
+                        />
                     </SlidePage>
                 </SlideTrack>
             </SlideContainer>
@@ -150,4 +186,14 @@ const DeviceGrid = styled.div`
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
     padding-bottom: 40px;
+    overflow: hidden;
+`
+
+const NetworkFill = styled.div`
+    grid-column: 1 / -1;
+    min-height: calc(100vh - 380px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `

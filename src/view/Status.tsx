@@ -1,29 +1,63 @@
-import { useState, useEffect } from "react"
-import { AreaSelector, DeviceLayout } from "../components"
-import { useMinSkeleton, useDevices } from "../hooks"
+import styled from "styled-components"
+import { AreaSelector, DeviceLayout, NetworkError } from "../components"
+import {
+    useMinSkeleton,
+    useDevicesSocket,
+    useNetworkRenderState,
+} from "../hooks"
 import { femaleLayout, maleDormLayout, maleSchoolLayout } from "../layouts"
-import { useAreaStore } from "../stores"
+import { useAreaStore, useNetworkStore } from "../stores"
+import type { DeviceState } from "../hooks/useDeviceStatusSocket"
+import { useState } from "react"
 
-export function Status() {
+interface Props {
+    states: DeviceState[]
+    loading: boolean
+    error: boolean
+}
+
+export function Status({ states, loading }: Props) {
     const { area } = useAreaStore()
+    const { status } = useNetworkStore()
     const [present, setPresent] = useState(area)
 
-    const [isLoading, setIsLoading] = useState(false)
-    const showSkeleton = useMinSkeleton(isLoading, 1000)
+    const showSkeleton = useMinSkeleton(loading, 500)
 
-    const female = useDevices(femaleLayout, showSkeleton)
-    const maleDorm = useDevices(maleDormLayout, showSkeleton)
-    const maleSchool = useDevices(maleSchoolLayout, showSkeleton)
+    const renderState = useNetworkRenderState({
+        status,
+        loading,
+        showSkeleton,
+    })
 
-    useEffect(() => {
-        setIsLoading(true)
+    const isSkeleton = renderState === "skeleton"
 
-        const t = setTimeout(() => {
-            setIsLoading(false)
-        }, 0)
+    const maleSchool = useDevicesSocket(
+        maleSchoolLayout,
+        states,
+        [1, 25],
+        isSkeleton
+    )
 
-        return () => clearTimeout(t)
-    }, [present])
+    const maleDorm = useDevicesSocket(
+        maleDormLayout,
+        states,
+        [26, 51],
+        isSkeleton
+    )
+
+    const female = useDevicesSocket(femaleLayout, states, [52, 67], isSkeleton)
+
+    if (renderState === "error") {
+        return (
+            <ErrorFill>
+                <NetworkError />
+            </ErrorFill>
+        )
+    }
+
+    if (renderState === "idle") {
+        return null
+    }
 
     return (
         <>
@@ -43,3 +77,12 @@ export function Status() {
         </>
     )
 }
+
+const ErrorFill = styled.div`
+    width: 100%;
+    min-height: 80vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`
