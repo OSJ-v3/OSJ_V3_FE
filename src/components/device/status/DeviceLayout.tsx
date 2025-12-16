@@ -1,4 +1,4 @@
-import { TriangleIcon } from "lucide-react"
+import { TriangleIcon } from "../../../assets/icons/triangle"
 import styled, { useTheme } from "styled-components"
 import { useMinSkeleton } from "../../../hooks"
 import { SkeletonDeviceLayout, DeviceColumn, type DeviceData } from ".."
