@@ -3,7 +3,7 @@ export type DeviceType = "WASH" | "DRY"
 export interface DeviceData {
     id: number
     type: DeviceType
-    state: 0 | 1 | 2 | 3
+    state: 0 | 1 | 2 | 3 | "skeleton"
 }
 
 export interface DeviceRef {
