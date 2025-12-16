@@ -7,10 +7,10 @@ import { useSystemTheme, useThemeColor } from "./hooks"
 import { useThemeStore } from "./stores"
 import { darkTheme, lightTheme, GlobalStyle, AppLayout } from "./styles"
 import { Main, Setting, Complain, Detail, Notice } from "./view"
-// import { useNetworkListener } from "./hooks/useNetworkListener"
+import { useNetworkListener } from "./hooks/useNetworkListener"
 
 function App() {
-    // useNetworkListener()
+    useNetworkListener()
 
     useEffect(() => {
         if ("serviceWorker" in navigator) {
