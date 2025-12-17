@@ -11,6 +11,8 @@
         "prepare": "husky install"
     },
     "dependencies": {
+        "@types/react-query": "^1.2.9",
+        "axios": "^1.13.2",
         "lucide-react": "^0.556.0",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
