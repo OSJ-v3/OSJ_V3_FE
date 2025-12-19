@@ -27,7 +27,16 @@ export function Complain() {
       return;
     }
 
-    mutate({ title, content, category: option });
+    mutate(
+      { title, content, category: option },
+      {
+        onSuccess: () => {
+          setOption(undefined);
+          setTitle("");
+          setContent("");
+        },
+      }
+    );
   };
 
   return (
