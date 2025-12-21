@@ -1,56 +1,44 @@
-import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
-import { Header, NoticeItem } from "../components"
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { Header, NoticeItem } from "../components";
+import { useNotices } from "../hooks/useNotices";
+import { useNoticeReadStore } from "../stores/useNoticeReadStore";
 
 export function Notice() {
-    const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { data, isLoading } = useNotices();
+  const { isRead } = useNoticeReadStore();
 
-    const notifications = [
-        {
-            id: 0,
-            title: "공지사항입니다.",
-            date: "2025-10-12",
-            readed: true,
-        },
-        {
-            id: 1,
-            title: "공지사항입니다.",
-            date: "2025-12-11",
-            readed: false,
-        },
-        {
-            id: 2,
-            title: "공지사항입니다.",
-            date: "2025-12-14",
-            readed: true,
-        },
-    ]
-
+  if (isLoading) {
     return (
-        <>
-            <Wrapper>
-                <Header title="공지사항" />
+      <Wrapper>
+        <Header title="공지사항" />
+      </Wrapper>
+    );
+  }
 
-                {notifications &&
-                    notifications.map((v, i) => (
-                        <NoticeItem
-                            key={i}
-                            title={v.title}
-                            date={v.date}
-                            readed={v.readed}
-                            onClick={() => navigate(`/notice/${v.id}`)}
-                        />
-                    ))}
-            </Wrapper>
-        </>
-    )
+  return (
+    <Wrapper>
+      <Header title="공지사항" />
+
+      {data?.map((notice) => (
+        <NoticeItem
+          key={notice.id}
+          title={notice.title}
+          date={notice.createdAt}
+          readed={isRead(String(notice.id))}
+          onClick={() => navigate(`/notice/${notice.id}`)}
+        />
+      ))}
+    </Wrapper>
+  );
 }
 
 const Wrapper = styled.div`
-    width: 100%;
-    display: flex;
-    justify-content: start;
-    align-items: start;
-    flex-direction: column;
-    gap: 28px;
-`
+  width: 100%;
+  display: flex;
+  justify-content: start;
+  align-items: start;
+  flex-direction: column;
+  gap: 28px;
+`;
