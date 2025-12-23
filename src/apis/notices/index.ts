@@ -1,7 +1,7 @@
 import { api } from "../index";
 import type { NoticesResponse } from "./types";
-import { MOCK_NOTICES } from "./mockData";
-import { getMockNoticeById } from "./mockData";
+/* import { MOCK_NOTICES } from "./mockData";
+import { getMockNoticeById } from "./mockData"; */
 
 export const getNotices = async (): Promise<NoticesResponse[]> => {
   const res = await api.get("/notices");
