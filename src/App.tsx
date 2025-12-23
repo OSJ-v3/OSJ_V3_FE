@@ -8,6 +8,8 @@ import { useThemeStore } from "./stores";
 import { darkTheme, lightTheme, GlobalStyle, AppLayout } from "./styles";
 import { Main, Setting, Complain, Detail, Notice } from "./view";
 import { useNetworkListener } from "./hooks/useNetworkListener";
+import "./firebase/settingFCM";
+import { initFCM } from "./hooks/useFCM";
 
 function App() {
   useNetworkListener();
@@ -18,6 +20,14 @@ function App() {
         regs.forEach((reg) => reg.update());
       });
     }
+  }, []);
+
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/firebase-messaging-sw.js");
+    }
+
+    initFCM();
   }, []);
 
   const { mode } = useThemeStore();
