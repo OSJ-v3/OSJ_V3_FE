@@ -10,6 +10,10 @@ import { Main, Setting, Complain, Detail, Notice } from "./view";
 import { useNetworkListener } from "./hooks/useNetworkListener";
 import "./firebase/settingFCM";
 import { initFCM } from "./hooks/useFCM";
+import { useFCMStore } from "./stores/fcmStore";
+import { usePushAlertList } from "./hooks/usePushAlertList";
+import { useAlarmStore } from "./stores";
+import { mapExpectStateToType } from "./utils/pushAlertMapper";
 
 function App() {
   useNetworkListener();
@@ -43,6 +47,21 @@ function App() {
       : lightTheme;
 
   useThemeColor(appliedTheme.colors.Surface);
+
+  const { token } = useFCMStore();
+  const { data } = usePushAlertList(token);
+  const { setAlarms } = useAlarmStore();
+
+  useEffect(() => {
+    if (!data) return;
+
+    setAlarms(
+      data.map((d) => ({
+        id: d.id,
+        type: mapExpectStateToType(d.expectState),
+      }))
+    );
+  }, [data, setAlarms]);
 
   return (
     <BrowserRouter>
