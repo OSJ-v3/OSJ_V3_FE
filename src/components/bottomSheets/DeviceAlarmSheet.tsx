@@ -20,8 +20,8 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
   const { token } = useFCMStore();
   const { hasAlarm } = useAlarmStore();
 
-  const { mutate: createAlert } = useCreatePushAlert();
-  const { mutate: deleteAlert } = useDeletePushAlert();
+  const { mutate: createAlert, isPending: isCreating } = useCreatePushAlert();
+  const { mutate: deleteAlert, isPending: isDeleting } = useDeletePushAlert();
 
   const isAlarmed = hasAlarm(device.id);
   const deviceName = device.type === "WASH" ? "세탁기" : "건조기";
@@ -34,12 +34,15 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
         onClose={onClose}
         actions={
           <>
-            <Button kind="gray" onClick={onClose}>
+            <Button kind="gray" onClick={onClose} disabled={isDeleting}>
               취소
             </Button>
             <Button
               onClick={() => {
-                if (!token) return;
+                if (!token) {
+                  alert("FCM 토큰이 없. 잠시 후 다시 시도 ㄱㄱ");
+                  return;
+                }
 
                 deleteAlert(
                   {
@@ -48,17 +51,22 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
                   },
                   {
                     onSuccess: () => {
+                      alert(`${device.id}번 ${deviceName} 알림 해제 완료`);
                       showToast(
                         `${deviceName} 알림이 해제되었습니다.`,
                         "success"
                       );
                       onClose();
                     },
+                    onError: (error: any) => {
+                      alert(`알림 해제 실패\n\n${error.message}`);
+                    },
                   }
                 );
               }}
+              disabled={isDeleting}
             >
-              알림 해제
+              {isDeleting ? "처리 중..." : "알림 해제"}
             </Button>
           </>
         }
@@ -74,12 +82,19 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
         onClose={onClose}
         actions={
           <>
-            <Button kind="gray" onClick={onClose}>
+            <Button kind="gray" onClick={onClose} disabled={isCreating}>
               취소
             </Button>
             <Button
               onClick={() => {
-                if (!token) return;
+                if (!token) {
+                  alert("FCM 토큰이 X 잠시 후 다시 시도ㄱㄱ");
+                  return;
+                }
+
+                alert(
+                  `알림 설정 시작\n\n기기 ID: ${device.id}\n타입: ${deviceName}\nexpectState: 1`
+                );
 
                 createAlert(
                   {
@@ -89,17 +104,22 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
                   },
                   {
                     onSuccess: () => {
+                      alert(`${device.id}번 ${deviceName} 알림 설정 완료!`);
                       showToast(
                         `${deviceName} 알림 설정이 완료되었습니다.`,
                         "success"
                       );
                       onClose();
                     },
+                    onError: (error: any) => {
+                      alert(`알림 설정 실패\n\n${error.message}`);
+                    },
                   }
                 );
               }}
+              disabled={isCreating}
             >
-              알림 설정
+              {isCreating ? "처리 중..." : "알림 설정"}
             </Button>
           </>
         }
