@@ -3,11 +3,24 @@ import styled from "styled-components";
 import { Header, NoticeItem } from "../components";
 import { useNotices } from "../hooks/useNotices";
 import { useNoticeReadStore } from "../stores/useNoticeReadStore";
+import { useNoticeAlarmStore } from "../stores/noticeAlarmStore";
+import { useEffect } from "react";
 
 export function Notice() {
   const navigate = useNavigate();
   const { data, isLoading } = useNotices();
   const { isRead } = useNoticeReadStore();
+  const { isSubscribed } = useNoticeAlarmStore();
+
+  useEffect(() => {
+    if (
+      !isLoading &&
+      Notification.permission === "granted" &&
+      isSubscribed === false
+    ) {
+      alert("공지 알림을 켜라.");
+    }
+  }, [isSubscribed, isLoading]);
 
   if (isLoading) {
     return (
