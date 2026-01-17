@@ -1,10 +1,13 @@
+import { api } from "../index";
+
 export interface PushAlertRequest {
   id: number;
   token: string;
-  expectState: number;
+  expect_state: number;
 }
 
 export interface PushAlertItem {
   id: number;
-  expectState: number;
+  deviceId: number;
+  expect_state: number;
 }
