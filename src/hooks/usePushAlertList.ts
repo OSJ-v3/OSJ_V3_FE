@@ -1,13 +1,3 @@
-/* import { useQuery } from "@tanstack/react-query";
-import { getPushAlertList } from "../apis/pushAlerts";
-
-export const usePushAlertList = () =>
-  useQuery({
-    queryKey: ["push-alerts"],
-    queryFn: getPushAlertList,
-    select: (res) => res.data,
-  }); */
-
 import { useQuery } from "@tanstack/react-query";
 import { getPushAlertList } from "../apis/pushAlerts";
 
@@ -16,4 +6,6 @@ export const usePushAlertList = (token: string | null) =>
     queryKey: ["push-alerts", token],
     queryFn: () => getPushAlertList(token!),
     enabled: !!token,
+    retry: 1,
+    staleTime: 30000,
   });
