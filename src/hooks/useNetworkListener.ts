@@ -3,8 +3,7 @@ import { useNetworkStore } from "../stores/useNetworkStore";
 import { checkSocket } from "../utils/checkSocket";
 
 const SOCKET_URL =
-  import.meta.env.VITE_WS_BASE_URL + "/client" ||
-  "ws://10.113.100.157:8080/client";
+  import.meta.env.VITE_WS_BASE_URL || "ws://10.113.100.157:8080/client";
 
 export function useNetworkListener() {
   const setStatus = useNetworkStore((s) => s.setStatus);
