@@ -51,7 +51,7 @@ export function useDeviceLayout(token: string) {
   };
 
   useEffect(() => {
-    const ws = new WebSocket(`${import.meta.env.VITE_WS_BASE_URL}/client`);
+    const ws = new WebSocket(`${import.meta.env.VITE_WS_BASE_URL}`);
     layoutSocket.current = ws;
 
     ws.onmessage = (msg) => {
@@ -66,7 +66,7 @@ export function useDeviceLayout(token: string) {
   }, [token]);
 
   useEffect(() => {
-    const ws = new WebSocket(`${import.meta.env.VITE_WS_BASE_URL}/client`);
+    const ws = new WebSocket(`${import.meta.env.VITE_WS_BASE_URL}`);
     statusSocket.current = ws;
 
     ws.onopen = () => {
