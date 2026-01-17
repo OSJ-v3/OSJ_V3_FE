@@ -1,4 +1,3 @@
-// public/firebase-messaging-sw.js
 importScripts(
   "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"
 );
@@ -6,42 +5,97 @@ importScripts(
   "https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"
 );
 
-console.log("서비스 워커 로드됨!");
-
 firebase.initializeApp({
-  apiKey: "AIzaSyC8MZ4EFI4hynwoPtIFkaKjUzHUiWrj7dQ",
-  authDomain: "osj-v3-b59bc.firebaseapp.com",
-  projectId: "osj-v3-b59bc",
-  storageBucket: "osj-v3-b59bc.firebasestorage.app",
-  messagingSenderId: "426446214466",
-  appId: "1:426446214466:web:ce81003dd57bc53933e4db",
+  apiKey: "AIzaSyAiMkLkgVZ41qPTr-RRYSQoowEPyGWgeY4",
+  authDomain: "osj-v3.firebaseapp.com",
+  projectId: "osj-v3",
+  storageBucket: "osj-v3.firebasestorage.app",
+  messagingSenderId: "96201396002",
+  appId: "1:96201396002:web:dfbd7de6ac05d42b545f7b",
 });
 
-console.log("Firebase 초기화 완!");
+self.addEventListener("install", () => {
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(clients.claim());
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
 
 const messaging = firebase.messaging();
 
-console.log("Messaging 인스턴스 생성 완!");
+const parseNotificationContent = (payload) => {
+  let title = "새 공지";
+  let body = "공지사항이 도착했습니다";
+  let tag = String(Date.now());
+
+  if (payload.notification) {
+    title = payload.notification.title || title;
+    body = payload.notification.body || body;
+  } else if (payload.data) {
+    if (payload.data.title && payload.data.content) {
+      title = payload.data.title;
+      body = payload.data.content;
+      tag = `notice-${payload.data.createAt || Date.now()}`;
+    } else if (payload.data.device_id) {
+      title = `${payload.data.device_id}번 기기 알림`;
+      body = `상태가 ${payload.data.state}로 변경되었습니다.`;
+      tag = `device-${payload.data.device_id}`;
+    }
+  }
+
+  return { title, body, tag };
+};
 
 messaging.onBackgroundMessage((payload) => {
-  console.log("백그라운드 메시지 수신!!!", payload);
+  const { title, body, tag } = parseNotificationContent(payload);
 
-  const notificationTitle = payload.notification?.title || "알림";
-  const notificationOptions = {
-    body: payload.notification?.body || "",
-    icon: payload.notification?.icon || "/icon.png",
+  const options = {
+    body,
+    icon: "/icon.png",
     badge: "/badge.png",
-    tag: payload.data?.id || Date.now().toString(),
+    tag,
+    data: payload.data || {},
+    requireInteraction: true,
   };
 
-  return self.registration.showNotification(
-    notificationTitle,
-    notificationOptions
+  self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => {
+      client.postMessage({
+        type: "FCM_RECEIVED",
+        title,
+        body,
+      });
+    });
+  });
+
+  return self.registration.showNotification(title, options);
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  const data = event.notification.data;
+  const urlToOpen = data?.device_id ? "/" : data?.createAt ? "/notice" : "/";
+
+  event.waitUntil(
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        for (const client of clientList) {
+          if (client.url.includes(urlToOpen) && "focus" in client) {
+            return client.focus();
+          }
+        }
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen);
+        }
+      })
   );
 });
-
-self.addEventListener("push", function (event) {
-  console.log("Push 이벤트 수신!", event);
-});
-
-console.log("서비스 워커 설정 완!");
