@@ -11,6 +11,7 @@ interface AlarmStore {
     hasAlarm: (id: number) => boolean
     addAlarm: (device: AlarmDevice) => void
     removeAlarm: (id: number) => void
+    setAlarms: (devices: AlarmDevice[]) => void
 }
 
 export const useAlarmStore = create<AlarmStore>()(
@@ -18,7 +19,7 @@ export const useAlarmStore = create<AlarmStore>()(
         (set, get) => ({
             alarms: [],
 
-            hasAlarm: (id) => get().alarms.some((device) => device.id === id),
+            hasAlarm: (id) => get().alarms.some((d) => d.id === id),
 
             addAlarm: (device) =>
                 set((state) => ({
@@ -29,9 +30,14 @@ export const useAlarmStore = create<AlarmStore>()(
                 set((state) => ({
                     alarms: state.alarms.filter((d) => d.id !== id),
                 })),
+
+            setAlarms: (devices) =>
+                set(() => ({
+                    alarms: devices,
+                })),
         }),
         {
             name: "alarm-store",
-        }
-    )
+        },
+    ),
 )
