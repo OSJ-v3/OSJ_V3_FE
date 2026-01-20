@@ -1,7 +1,5 @@
-import { useEffect } from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { ThemeProvider } from "styled-components"
-import { AlarmRenderer, Splash, ToastRenderer } from "./components"
 import { AlarmProvider, ToastProvider } from "./contexts"
 import { useSystemTheme, useThemeColor } from "./hooks"
 import { useThemeStore } from "./stores"
@@ -9,17 +7,10 @@ import { darkTheme, lightTheme, GlobalStyle, AppLayout } from "./styles"
 import { Main, Setting, Complain, Detail, Notice } from "./view"
 import { useNetworkListener } from "./hooks/useNetworkListener"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { AlarmRenderer, Splash, ToastRenderer } from "./components/common"
 
 function App() {
     useNetworkListener()
-
-    useEffect(() => {
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.getRegistrations().then((regs) => {
-                regs.forEach((reg) => reg.update())
-            })
-        }
-    }, [])
 
     const { mode } = useThemeStore()
     const systemTheme = useSystemTheme()
@@ -45,9 +36,7 @@ function App() {
                         <ToastProvider>
                             <Splash />
                             <GlobalStyle />
-
                             <ToastRenderer />
-
                             <AppLayout>
                                 <Routes>
                                     <Route path="/" element={<Main />} />
