@@ -1,17 +1,22 @@
 import { BellIcon } from "../../../assets"
 import { useNavigate } from "react-router-dom"
 import styled, { useTheme } from "styled-components"
+import { useNotices } from "../../../apis/notice"
+import { useNoticeReadStore } from "../../../stores/useNoticeReadStore"
 
 export function Notice() {
     const theme = useTheme()
     const navigate = useNavigate()
 
-    const hasUnread = true
+    const { data } = useNotices()
+    const readIds = useNoticeReadStore((s) => s.readIds)
+
+    const hasUnread =
+        data?.some((notice) => !readIds.includes(notice.id)) ?? false
 
     return (
         <BellWrapper onClick={() => navigate("/notice")}>
             <BellIcon color={theme.colors.Gray.OnSecondary} />
-
             {hasUnread && <UnreadDot />}
         </BellWrapper>
     )
