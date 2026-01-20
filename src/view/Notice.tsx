@@ -1,48 +1,31 @@
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import { Header, NoticeItem } from "../components"
+import { Header, Spinner, NoticeItem } from "../components"
+import { useNotices } from "../apis/notice"
+import { useNoticeReadStore } from "../stores/useNoticeReadStore"
 
 export function Notice() {
     const navigate = useNavigate()
+    const { data, isLoading, error } = useNotices()
+    const isRead = useNoticeReadStore((s) => s.isRead)
 
-    const notifications = [
-        {
-            id: 0,
-            title: "공지사항입니다.",
-            date: "2025-10-12",
-            readed: true,
-        },
-        {
-            id: 1,
-            title: "공지사항입니다.",
-            date: "2025-12-11",
-            readed: false,
-        },
-        {
-            id: 2,
-            title: "공지사항입니다.",
-            date: "2025-12-14",
-            readed: true,
-        },
-    ]
+    if (isLoading) return <Spinner />
+    if (error) return <div>에러 발생</div>
 
     return (
-        <>
-            <Wrapper>
-                <Header title="공지사항" />
+        <Wrapper>
+            <Header title="공지사항" />
 
-                {notifications &&
-                    notifications.map((v, i) => (
-                        <NoticeItem
-                            key={i}
-                            title={v.title}
-                            date={v.date}
-                            readed={v.readed}
-                            onClick={() => navigate(`/notice/${v.id}`)}
-                        />
-                    ))}
-            </Wrapper>
-        </>
+            {data?.map((v) => (
+                <NoticeItem
+                    key={v.id}
+                    title={v.title}
+                    date={v.createdAt}
+                    readed={isRead(v.id)}
+                    onClick={() => navigate(`/notice/${v.id}`)}
+                />
+            ))}
+        </Wrapper>
     )
 }
 
