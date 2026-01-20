@@ -1,54 +1,49 @@
 import { useParams } from "react-router-dom"
 import styled, { css } from "styled-components"
-import { Header, Text } from "../components"
+import { Header, Spinner, Text } from "../components"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { useNoticeDetail } from "../apis/notice"
+import { useEffect } from "react"
+import { useNoticeReadStore } from "../stores/useNoticeReadStore"
 
 export function Detail() {
     const { id } = useParams()
+    const noticeId = Number(id)
 
-    const today = new Date()
-    const year = today.getFullYear()
-    const month = String(today.getMonth() + 1).padStart(2, "0")
-    const day = String(+today.getDate() + Number(id)).padStart(2, "0")
+    const { data, isLoading, error } = useNoticeDetail(noticeId)
 
-    const formattedDate = `${year}-${month}-${day}`
+    const markAsRead = useNoticeReadStore((s) => s.markAsRead)
 
-    const content = `
-## 공지 안내
+    useEffect(() => {
+        if (!id) return
+        markAsRead(Number(id))
+    }, [id])
 
-**오상진 선생님의 차량인 카니발**의  
-연비가 잘 나온다는 소식입니다.
-
-- 연비 향상
-- 주행 안정성 개선
-- 유지비 절감
-
-> 많은 관심 부탁드립니다.
-`
+    if (isLoading) return <Spinner />
+    if (error) return <div>에러 발생</div>
+    if (!data) return null
 
     return (
-        <>
-            <Wrapper>
-                <Header />
+        <Wrapper>
+            <Header />
 
-                <Text font={"heading3"} color="System.InverseSurface">
-                    {id}번 공지 제목입니다
+            <Text font={"heading3"} color="System.InverseSurface">
+                {data.title}
+            </Text>
+
+            <ContentWrapper>
+                <Text font="button1" color="Gray.OnSecondary">
+                    {data.createdAt}
                 </Text>
 
-                <ContentWrapper>
-                    <Text font="button1" color="Gray.OnSecondary">
-                        {formattedDate}
-                    </Text>
-
-                    <Markdown>
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {content}
-                        </ReactMarkdown>
-                    </Markdown>
-                </ContentWrapper>
-            </Wrapper>
-        </>
+                <Markdown>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {data.content}
+                    </ReactMarkdown>
+                </Markdown>
+            </ContentWrapper>
+        </Wrapper>
     )
 }
 
