@@ -46,5 +46,5 @@ const PairBox = styled.div`
 `
 
 const Empty = styled.div`
-    height: 100px;
+    height: auto;
 `

@@ -71,5 +71,5 @@ const TriangleWrapper = styled.div`
 `
 
 const EmptySkeleton = styled.div`
-    height: 100px;
+    height: auto;
 `
