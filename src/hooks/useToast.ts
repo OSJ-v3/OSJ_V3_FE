@@ -9,8 +9,8 @@ export function useToast() {
 
     const [visible, setVisible] = useState(false)
 
-    const hideTimer = useRef<NodeJS.Timeout | null>(null)
-    const removeTimer = useRef<NodeJS.Timeout | null>(null)
+    const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const removeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const showToast = useCallback((text: string, type: ToastType) => {
         if (hideTimer.current) clearTimeout(hideTimer.current)
