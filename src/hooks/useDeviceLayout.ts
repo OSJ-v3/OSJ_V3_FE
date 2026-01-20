@@ -36,7 +36,7 @@ export function useDeviceLayout(token: string) {
 
     const mergeLayoutAndStates = (
         layout: LayoutZone,
-        states: DeviceState[]
+        states: DeviceState[],
     ) => {
         const deviceData: DeviceData[] = layout.cells
             .filter((c) => c.device)
@@ -54,7 +54,7 @@ export function useDeviceLayout(token: string) {
     }
 
     useEffect(() => {
-        const ws = new WebSocket(`나중에 api 링크 넣을 예정`)
+        const ws = new WebSocket(import.meta.env.VITE_WS_BASE_URL)
         layoutSocket.current = ws
 
         ws.onmessage = (msg) => {
@@ -69,7 +69,7 @@ export function useDeviceLayout(token: string) {
     }, [token])
 
     useEffect(() => {
-        const ws = new WebSocket(`나중에 api 링크 넣을 예정`)
+        const ws = new WebSocket(import.meta.env.VITE_WS_BASE_URL)
         statusSocket.current = ws
 
         ws.onopen = () => {
@@ -77,7 +77,7 @@ export function useDeviceLayout(token: string) {
                 JSON.stringify({
                     event: "get-devices-status",
                     zone_id: 1,
-                })
+                }),
             )
         }
 
