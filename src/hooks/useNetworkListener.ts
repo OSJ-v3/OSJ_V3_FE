@@ -2,8 +2,7 @@ import { useEffect } from "react"
 import { useNetworkStore } from "../stores/useNetworkStore"
 import { checkSocket } from "../utils/checkSocket"
 
-const SOCKET_URL =
-    import.meta.env.WS_BASE_URL || "ws://10.113.100.157:8080/client"
+const SOCKET_URL = import.meta.env.VITE_WS_BASE_URL
 
 export function useNetworkListener() {
     const setStatus = useNetworkStore((s) => s.setStatus)

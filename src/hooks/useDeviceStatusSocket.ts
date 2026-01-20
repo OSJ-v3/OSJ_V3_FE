@@ -7,8 +7,7 @@ export interface DeviceState {
 
 type SocketStatus = "connecting" | "connected" | "error"
 
-const SOCKET_URL =
-    import.meta.env.WS_BASE_URL || "ws://10.113.100.157:8080/client"
+const SOCKET_URL = import.meta.env.VITE_WS_BASE_URL
 
 export function useDeviceStatusSocket() {
     const [states, setStates] = useState<DeviceState[]>([])
