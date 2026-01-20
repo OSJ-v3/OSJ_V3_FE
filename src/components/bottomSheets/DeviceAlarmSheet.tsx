@@ -1,6 +1,8 @@
 import { useToastContext } from "../../contexts"
 import { useAlarmStore } from "../../stores"
 import { BottomSheet, Button } from "../common"
+import { instance } from "../../apis"
+import { useFcmStore } from "../../stores/useFcmStore"
 
 interface Props {
     device: {
@@ -14,9 +16,44 @@ interface Props {
 export function DeviceAlarmSheet({ device, onClose }: Props) {
     const { showToast } = useToastContext()
     const { hasAlarm, addAlarm, removeAlarm } = useAlarmStore()
+    const { token } = useFcmStore()
     const isAlarmed = hasAlarm(device.id)
 
     const deviceName = device.type === "WASH" ? "세탁기" : "건조기"
+
+    const handleRemoveAlarm = async () => {
+        removeAlarm(device.id)
+        showToast(`${deviceName} 알림이 해제되었습니다.`, "success")
+        onClose()
+
+        if (!token) return
+        try {
+            await instance.delete("/push-alerts", {
+                data: {
+                    id: device.id,
+                    token,
+                },
+            })
+        } catch (err) {
+            console.error("알람 해제 요청 실패", err)
+        }
+    }
+
+    const handleAddAlarm = async () => {
+        addAlarm({ id: device.id, type: device.type })
+        showToast(`${deviceName} 알림 설정이 완료되었습니다.`, "success")
+        onClose()
+
+        if (!token) return
+        try {
+            await instance.post("/push-alerts", {
+                id: device.id,
+                token,
+            })
+        } catch (err) {
+            console.error("알람 등록 요청 실패", err)
+        }
+    }
 
     if (isAlarmed) {
         return (
@@ -29,20 +66,7 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
                         <Button kind="gray" onClick={onClose}>
                             취소
                         </Button>
-                        <Button
-                            onClick={() => {
-                                removeAlarm(device.id)
-
-                                showToast(
-                                    `${deviceName} 알림이 해제되었습니다.`,
-                                    "success"
-                                )
-
-                                onClose()
-                            }}
-                        >
-                            알림 해제
-                        </Button>
+                        <Button onClick={handleRemoveAlarm}>알림 해제</Button>
                     </>
                 }
             />
@@ -60,23 +84,7 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
                         <Button kind="gray" onClick={onClose}>
                             취소
                         </Button>
-                        <Button
-                            onClick={() => {
-                                addAlarm({
-                                    id: device.id,
-                                    type: device.type,
-                                })
-
-                                showToast(
-                                    `${deviceName} 알림 설정이 완료되었습니다.`,
-                                    "success"
-                                )
-
-                                onClose()
-                            }}
-                        >
-                            알림 설정
-                        </Button>
+                        <Button onClick={handleAddAlarm}>알림 설정</Button>
                     </>
                 }
             />
