@@ -2,6 +2,8 @@ import { firebaseMessaging } from "./firebase"
 import { getToken, onMessage } from "firebase/messaging"
 
 export async function requestPermissionAndGetToken(): Promise<string | null> {
+    if (!("Notification" in window)) return null
+
     try {
         const permission = await Notification.requestPermission()
         if (permission !== "granted") return null
@@ -22,6 +24,13 @@ export function listenForegroundMessage(
 ) {
     return onMessage(firebaseMessaging, (payload) => {
         console.log("[FCM] message received:", payload)
-        if (onMessageHandler) onMessageHandler(payload)
+
+        const { title, body } = payload.notification ?? {}
+
+        if (title && Notification.permission === "granted") {
+            new Notification(title, { body })
+        }
+
+        onMessageHandler?.(payload)
     })
 }

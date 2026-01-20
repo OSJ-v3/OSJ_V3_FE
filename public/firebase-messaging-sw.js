@@ -1,31 +1,24 @@
-/// <reference lib="webworker" />
+importScripts(
+    "https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js",
+)
+importScripts(
+    "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js",
+)
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"
-import {
-    getMessaging,
-    onBackgroundMessage,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-sw.js"
+firebase.initializeApp({
+    apiKey: "AIzaSyAiMkLkgVZ41qPTr-RRYSQoowEPyGWgeY4",
+    authDomain: "osj-v3.firebaseapp.com",
+    projectId: "osj-v3",
+    storageBucket: "osj-v3.firebasestorage.app",
+    messagingSenderId: "96201396002",
+    appId: "1:96201396002:web:dfbd7de6ac05d42b545f7b",
+})
 
-const firebaseConfig = {
-    apiKey: "...",
-    authDomain: "...",
-    projectId: "...",
-    storageBucket: "...",
-    messagingSenderId: "...",
-    appId: "...",
-}
+const messaging = firebase.messaging()
 
-const app = initializeApp(firebaseConfig)
-const messaging = getMessaging(app)
-
-onBackgroundMessage(messaging, (payload) => {
-    console.log("[SW] Background message:", payload)
-
-    const title = payload.notification?.title || "알림"
-    const options = {
-        body: payload.notification?.body,
-        icon: "/icons/icon-512.png",
-    }
-
-    self.registration.showNotification(title, options)
+messaging.onBackgroundMessage((payload) => {
+    self.registration.showNotification(payload.notification.title, {
+        body: payload.notification.body,
+        icon: "/favicon.ico",
+    })
 })

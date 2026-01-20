@@ -6,25 +6,13 @@ export default defineConfig({
     plugins: [
         react(),
         VitePWA({
-            strategies: "injectManifest",
-            srcDir: "public",
-            filename: "firebase-messaging-sw.js",
-
             registerType: "autoUpdate",
-
-            devOptions: {
-                enabled: true,
-                type: "module",
-            },
-
             includeAssets: [
                 "icons/favicon.ico",
                 "icons/icon-192.png",
                 "icons/icon-512.png",
                 "splash/apple-touch-icon.png",
             ],
-
-            manifestFilename: "manifest.webmanifest",
             manifest: {
                 name: "OSJ",
                 short_name: "OSJ",
