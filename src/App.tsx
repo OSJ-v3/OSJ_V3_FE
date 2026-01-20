@@ -8,9 +8,11 @@ import { Main, Setting, Complain, Detail, Notice } from "./view"
 import { useNetworkListener } from "./hooks/useNetworkListener"
 import { AlarmRenderer, Splash, ToastRenderer } from "./components/common"
 import { useInitNoticePush } from "./hooks/useInitNoticePush"
+import { useSyncAlarmFromServer } from "./hooks/useSyncAlarmFromServer"
 
 function App() {
     useInitNoticePush()
+    useSyncAlarmFromServer()
     useNetworkListener()
 
     const { mode } = useThemeStore()

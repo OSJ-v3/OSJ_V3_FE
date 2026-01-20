@@ -22,11 +22,11 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
     const deviceName = device.type === "WASH" ? "세탁기" : "건조기"
 
     const handleRemoveAlarm = async () => {
-        removeAlarm(device.id)
-        showToast(`${deviceName} 알림이 해제되었습니다.`, "success")
-        onClose()
+        if (!token) {
+            showToast("알림 토큰이 없습니다.", "error")
+            return
+        }
 
-        if (!token) return
         try {
             await instance.delete("/push-alerts", {
                 data: {
@@ -34,24 +34,55 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
                     token,
                 },
             })
-        } catch (err) {
-            console.error("알람 해제 요청 실패", err)
+
+            removeAlarm(device.id)
+            showToast(`${deviceName} 알림이 해제되었습니다.`, "success")
+            onClose()
+        } catch (err: any) {
+            const status = err?.response?.status
+
+            if (status === 404) {
+                showToast("존재하지 않는 기기입니다.", "error")
+            } else if (status === 409) {
+                showToast("이미 알림이 해제된 상태입니다.", "info")
+            } else {
+                showToast("알림 해제에 실패했어요.", "error")
+                console.error("알람 해제 요청 실패", err)
+            }
         }
     }
 
     const handleAddAlarm = async () => {
-        addAlarm({ id: device.id, type: device.type })
-        showToast(`${deviceName} 알림 설정이 완료되었습니다.`, "success")
-        onClose()
+        if (device.state !== 0) {
+            showToast("작동 중인 기기만 알림을 설정할 수 있어요.", "error")
+            return
+        }
 
-        if (!token) return
+        if (!token) {
+            showToast("알림 토큰이 없습니다.", "error")
+            return
+        }
+
         try {
             await instance.post("/push-alerts", {
                 id: device.id,
                 token,
             })
-        } catch (err) {
-            console.error("알람 등록 요청 실패", err)
+
+            addAlarm({ id: device.id, type: device.type })
+            showToast(`${deviceName} 알림 설정이 완료되었습니다.`, "success")
+            onClose()
+        } catch (err: any) {
+            const status = err?.response?.status
+
+            if (status === 404) {
+                showToast("존재하지 않는 기기입니다.", "error")
+            } else if (status === 409) {
+                showToast("이미 알림이 설정되어 있어요.", "info")
+            } else {
+                showToast("알림 설정에 실패했어요.", "error")
+                console.error("알람 등록 요청 실패", err)
+            }
         }
     }
 
