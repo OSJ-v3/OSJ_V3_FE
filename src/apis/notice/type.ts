@@ -4,3 +4,7 @@ export interface NoticeResponse {
     content: string
     createdAt: string
 }
+
+export interface NoticeAlertRequest {
+    isSubscribed: boolean
+}
