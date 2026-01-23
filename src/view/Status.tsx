@@ -1,5 +1,10 @@
 import styled from "styled-components"
-import { AreaSelector, DeviceLayout, NetworkError } from "../components"
+import {
+    AreaSelector,
+    DeviceLayout,
+    NetworkError,
+    SkeletonDeviceLayout,
+} from "../components"
 import {
     useMinSkeleton,
     useDevicesSocket,
@@ -35,14 +40,14 @@ export function Status({ states, loading }: Props) {
         maleSchoolLayout,
         states,
         [1, 25],
-        isSkeleton
+        isSkeleton,
     )
 
     const maleDorm = useDevicesSocket(
         maleDormLayout,
         states,
         [26, 51],
-        isSkeleton
+        isSkeleton,
     )
 
     const female = useDevicesSocket(femaleLayout, states, [52, 67], isSkeleton)
@@ -55,24 +60,42 @@ export function Status({ states, loading }: Props) {
         )
     }
 
-    if (renderState === "idle") {
-        return null
-    }
-
     return (
         <>
             <AreaSelector value={present} onChange={setPresent} />
 
-            {present === "남자 학교측" && (
-                <DeviceLayout layout={maleSchoolLayout} devices={maleSchool} />
+            {renderState === "skeleton" && (
+                <SkeletonDeviceLayout
+                    layout={
+                        present === "남자 학교측"
+                            ? maleSchoolLayout
+                            : present === "남자 기숙사측"
+                              ? maleDormLayout
+                              : femaleLayout
+                    }
+                />
             )}
 
-            {present === "남자 기숙사측" && (
-                <DeviceLayout layout={maleDormLayout} devices={maleDorm} />
-            )}
+            {renderState === "content" && (
+                <>
+                    {present === "남자 학교측" && (
+                        <DeviceLayout
+                            layout={maleSchoolLayout}
+                            devices={maleSchool}
+                        />
+                    )}
 
-            {present === "여자" && (
-                <DeviceLayout layout={femaleLayout} devices={female} />
+                    {present === "남자 기숙사측" && (
+                        <DeviceLayout
+                            layout={maleDormLayout}
+                            devices={maleDorm}
+                        />
+                    )}
+
+                    {present === "여자" && (
+                        <DeviceLayout layout={femaleLayout} devices={female} />
+                    )}
+                </>
             )}
         </>
     )
