@@ -1,7 +1,6 @@
 import { TriangleIcon } from "../../../assets/icons/triangle"
 import styled, { useTheme } from "styled-components"
-import { useMinSkeleton } from "../../../hooks"
-import { SkeletonDeviceLayout, DeviceColumn, type DeviceData } from ".."
+import { DeviceColumn, type DeviceData } from ".."
 
 interface Props {
     layout: any[]
@@ -11,19 +10,13 @@ interface Props {
 export function DeviceLayout({ layout, devices }: Props) {
     const theme = useTheme()
 
-    const isLoading =
-        !layout || layout.length === 0 || !devices || devices.length === 0
-
-    const showSkeleton = useMinSkeleton(isLoading, 1000)
-
-    if (showSkeleton) {
-        return <SkeletonDeviceLayout layout={layout ?? []} />
-    }
-
-    const deviceMap = (devices || []).reduce((acc, d) => {
-        acc[d.id] = d
-        return acc
-    }, {} as Record<number, DeviceData>)
+    const deviceMap = devices.reduce(
+        (acc, d) => {
+            acc[d.id] = d
+            return acc
+        },
+        {} as Record<number, DeviceData>,
+    )
 
     return (
         <Wrapper>

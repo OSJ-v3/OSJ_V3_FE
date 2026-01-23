@@ -10,3 +10,18 @@ export interface AlarmData {
     type: "WASH" | "DRY"
     duration: string
 }
+
+export type Alarm =
+    | {
+          type: "NOTICE"
+          title: string
+          content: string
+          createdAt: number
+      }
+    | {
+          type: "DEVICE"
+          deviceId: number
+          title: string
+          content: string
+          createdAt: number
+      }

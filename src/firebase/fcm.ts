@@ -1,16 +1,10 @@
+import { useAlarmStore } from "../stores"
+import { useAlarmModalStore } from "../stores/useAlarmModalStore"
 import { useFcmStore } from "../stores/useFcmStore"
+import { calcDuration } from "../utils/calcDuration"
+import { getDeviceType } from "../utils/deviceType"
 import { firebaseMessaging } from "./firebase"
-import { getToken, onMessage } from "firebase/messaging"
-
-const WASHER_IDS = new Set([
-    1, 3, 5, 7, 8, 9, 10, 11, 18, 20, 21, 22, 23, 30, 32, 33, 35, 36, 37, 42,
-    44, 45, 47, 48, 49, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-])
-
-const DRYER_IDS = new Set([
-    2, 4, 6, 12, 13, 14, 15, 16, 17, 24, 25, 26, 27, 28, 29, 31, 34, 38, 39, 40,
-    41, 43, 46, 50, 51, 62, 63, 64, 65, 66, 67,
-])
+import { getToken, onMessage, type MessagePayload } from "firebase/messaging"
 
 export async function requestPermissionAndSyncToken(
     syncTokenToServer: (token: string) => Promise<void>,
@@ -21,8 +15,11 @@ export async function requestPermissionAndSyncToken(
         const permission = await Notification.requestPermission()
         if (permission !== "granted") return null
 
+        const registration = await navigator.serviceWorker.ready
+
         const newToken = await getToken(firebaseMessaging, {
             vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+            serviceWorkerRegistration: registration,
         })
 
         if (!newToken) return null
@@ -31,7 +28,6 @@ export async function requestPermissionAndSyncToken(
 
         if (savedToken !== newToken) {
             console.log("[FCM] token changed → sync")
-
             await syncTokenToServer(newToken)
             setToken(newToken)
         } else {
@@ -45,38 +41,36 @@ export async function requestPermissionAndSyncToken(
     }
 }
 
-export function listenForegroundMessage(
-    onMessageHandler?: (payload: any) => void,
-) {
-    return onMessage(firebaseMessaging, (payload) => {
-        console.log("[FCM foreground]", payload)
+export function listenForegroundMessage() {
+    const openAlarmModal = useAlarmModalStore.getState().open
+    const removeAlarm = useAlarmStore.getState().removeAlarm
 
-        const data = payload.data
-        if (!data) return
+    return onMessage(firebaseMessaging, (payload: MessagePayload) => {
+        console.log("[FCM foreground]", payload) // 반드시 찍히게
 
-        let title = "알림"
-        let body = ""
+        const data = payload.data as Record<string, string> | undefined
+        if (!data?.device_id || !data.prevAt || !data.now) return
 
-        if (data.title && data.content) {
-            title = data.title
-            body = data.content
-        }
+        const id = Number(data.device_id)
+        if (Number.isNaN(id)) return
 
-        if (data.device_id) {
-            const deviceId = Number(data.device_id)
+        removeAlarm(id)
 
-            let deviceName = "기기"
-            if (WASHER_IDS.has(deviceId)) deviceName = "세탁기"
-            if (DRYER_IDS.has(deviceId)) deviceName = "건조기"
+        openAlarmModal({
+            id,
+            type: getDeviceType(id),
+            duration: calcDuration(data.prevAt, data.now),
+        })
 
-            title = "작동 완료 알림"
-            body = `${deviceId}번 ${deviceName}가 완료되었습니다`
-        }
-
+        // 포그라운드에서 브라우저 알림도 원하면
         if (Notification.permission === "granted") {
-            new Notification(title, { body })
+            new Notification(
+                `${id}번 ${getDeviceType(id) === "WASH" ? "세탁기" : "건조기"} 종료 알림`,
+                {
+                    body: `작동이 완료되었습니다.`,
+                    tag: `device-${id}`,
+                },
+            )
         }
-
-        onMessageHandler?.(payload)
     })
 }

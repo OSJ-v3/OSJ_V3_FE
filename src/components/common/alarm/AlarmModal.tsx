@@ -1,14 +1,14 @@
 import styled from "styled-components"
 import { Button, Text } from ".."
+import { useAlarmModalStore } from "../../../stores/useAlarmModalStore"
 
-interface Props {
-    id: number
-    type: "WASH" | "DRY"
-    duration: string
-    onConfirm: () => void
-}
+export function AlarmModal({ onConfirm }: { onConfirm: () => void }) {
+    const data = useAlarmModalStore((s) => s.data)
 
-export function AlarmModal({ id, type, duration, onConfirm }: Props) {
+    if (!data) return null
+
+    const { id, type, duration } = data
+
     return (
         <Card>
             <Content>
@@ -44,7 +44,9 @@ const Card = styled.div`
     gap: 16px;
 
     animation: slideIn 0.25s ease-out;
-    transition: transform 0.25s ease, opacity 0.25s ease;
+    transition:
+        transform 0.25s ease,
+        opacity 0.25s ease;
 
     pointer-events: auto;
 

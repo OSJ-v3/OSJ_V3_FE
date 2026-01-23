@@ -34,7 +34,7 @@ export function Detail() {
 
             <ContentWrapper>
                 <Text font="button1" color="Gray.OnSecondary">
-                    {data.createdAt}
+                    {data.createdAt.slice(0, 10)}
                 </Text>
 
                 <Markdown>
