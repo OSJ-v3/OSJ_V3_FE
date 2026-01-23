@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { useNetworkStore } from "../stores/useNetworkStore"
 
 export interface DeviceState {
     id: number
@@ -10,11 +11,28 @@ type SocketStatus = "connecting" | "connected" | "error"
 const SOCKET_URL = import.meta.env.VITE_WS_BASE_URL
 
 export function useDeviceStatusSocket() {
+    const networkStatus = useNetworkStore((s) => s.status)
+
     const [states, setStates] = useState<DeviceState[]>([])
     const [status, setStatus] = useState<SocketStatus>("connecting")
     const socketRef = useRef<WebSocket | null>(null)
 
     useEffect(() => {
+        if (networkStatus === "connecting") {
+            setStatus("connecting")
+            return
+        }
+
+        if (networkStatus === "offline") {
+            socketRef.current?.close()
+            socketRef.current = null
+            setStatus("error")
+            setStates([])
+            return
+        }
+
+        setStatus("connecting")
+
         const ws = new WebSocket(SOCKET_URL)
         socketRef.current = ws
 
@@ -67,13 +85,13 @@ export function useDeviceStatusSocket() {
             clearTimeout(timeout)
             ws.close()
         }
-    }, [])
+    }, [networkStatus])
 
     return {
         states,
         status,
         ready: status === "connected",
-        error: status === "error",
         loading: status === "connecting",
+        error: status === "error",
     }
 }
