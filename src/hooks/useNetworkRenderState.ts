@@ -12,12 +12,11 @@ export function useNetworkRenderState({
     loading,
     showSkeleton,
 }: Params) {
-    return useMemo<"idle" | "skeleton" | "error" | "content">(() => {
+    return useMemo<"skeleton" | "error" | "content">(() => {
         if (status === "offline") return "error"
 
-        if (status === "connecting") {
-            if (!loading || !showSkeleton) return "idle"
-            return "skeleton"
+        if (status === "connecting" && loading) {
+            return showSkeleton ? "skeleton" : "content"
         }
 
         return "content"
