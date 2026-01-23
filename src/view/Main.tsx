@@ -27,7 +27,7 @@ export function Main() {
     const { states, loading, error } = useDeviceStatusSocket()
     const stateMap = useMemo(
         () => new Map(states.map((s) => [s.id, s.state])),
-        [states]
+        [states],
     )
     const showSkeleton = useMinSkeleton(loading, 500)
 
@@ -96,8 +96,6 @@ export function Main() {
                         </TextContainer>
 
                         <DeviceGrid>
-                            {renderState === "idle" && null}
-
                             {renderState === "skeleton" &&
                                 Array.from({ length: 6 }).map((_, i) => (
                                     <SkeletonMyDevice key={i} />
