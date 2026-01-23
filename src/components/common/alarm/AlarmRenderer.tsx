@@ -1,14 +1,14 @@
 import { useEffect } from "react"
 import { createPortal } from "react-dom"
 import styled from "styled-components"
-import { useAlarmContext } from "../../../contexts"
+import { useAlarmModalStore } from "../../../stores/useAlarmModalStore"
 import { AlarmModal } from "./AlarmModal"
 
 export function AlarmRenderer() {
-    const { alarms, closeAlarm } = useAlarmContext()
+    const { isOpen, close, triggerAt } = useAlarmModalStore()
 
     useEffect(() => {
-        if (!alarms.length) return
+        if (!isOpen) return
 
         const original = document.body.style.overflow
         document.body.style.overflow = "hidden"
@@ -16,23 +16,15 @@ export function AlarmRenderer() {
         return () => {
             document.body.style.overflow = original
         }
-    }, [alarms.length])
+    }, [isOpen])
 
-    if (!alarms.length) return null
+    if (!isOpen) return null
 
     return createPortal(
         <Overlay>
-            <StackScroll>
-                {alarms.map((alarm) => (
-                    <AlarmModal
-                        key={alarm.id}
-                        {...alarm}
-                        onConfirm={() => closeAlarm(alarm.id)}
-                    />
-                ))}
-            </StackScroll>
+            <AlarmModal key={triggerAt} onConfirm={close} />
         </Overlay>,
-        document.body
+        document.body,
     )
 }
 
@@ -51,25 +43,4 @@ const Overlay = styled.div`
     pointer-events: auto;
 
     overflow: hidden;
-`
-
-const StackScroll = styled.div`
-    margin-top: 20px;
-    width: 100%;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-
-    -webkit-overflow-scrolling: touch;
-
-    pointer-events: none;
-
-    > * {
-        pointer-events: auto;
-    }
 `
