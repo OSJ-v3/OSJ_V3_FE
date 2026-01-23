@@ -22,7 +22,7 @@ export function NoticeItem({ title, date, readed = false, onClick }: Props) {
                             {title}
                         </Text>
                         <Text font={"label"} color="Gray.SurfaceContainer">
-                            {date}
+                            {date.slice(0, 10)}
                         </Text>
                     </TitleWrapper>
                 </ContentWrapper>
