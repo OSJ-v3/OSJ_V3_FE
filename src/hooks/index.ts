@@ -1,4 +1,3 @@
-export * from "./useAlarmModal"
 export * from "./useDeviceLayout"
 export * from "./useMinSkeleton"
 export * from "./useNetworkListener"
