@@ -1,26 +1,21 @@
-import { useEffect, useRef } from "react"
-import {
-    requestPermissionAndSyncToken,
-    listenForegroundMessage,
-} from "../firebase/fcm"
-import { useRegisterNoticePush } from "../apis/notice"
+import { useEffect } from "react"
+import { useAlarmStore } from "../stores/useAlarmStore"
 
 export function useInitNoticePush() {
-    const registerMutation = useRegisterNoticePush()
-    const requestedRef = useRef(false)
+    const removeAlarm = useAlarmStore((s) => s.removeAlarm)
 
     useEffect(() => {
-        if (requestedRef.current) return
-        requestedRef.current = true
+        if (!navigator.serviceWorker) return
 
-        if (!("Notification" in window)) return
+        const handler = (e: MessageEvent) => {
+            if (e.data?.type === "DEVICE") {
+                removeAlarm(e.data.id)
+            }
+        }
 
-        requestPermissionAndSyncToken(async (token) => {
-            await registerMutation.mutateAsync(token)
-        })
-
-        const unsubscribe = listenForegroundMessage()
-
-        return () => unsubscribe?.()
-    }, [registerMutation])
+        navigator.serviceWorker.addEventListener("message", handler)
+        return () => {
+            navigator.serviceWorker.removeEventListener("message", handler)
+        }
+    }, [removeAlarm])
 }

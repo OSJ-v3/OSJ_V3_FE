@@ -18,6 +18,20 @@ export function useDeviceStatusSocket() {
     const socketRef = useRef<WebSocket | null>(null)
 
     useEffect(() => {
+        const handler = (e: Event) => {
+            const { id } = (e as CustomEvent<{ id: number }>).detail
+            setStates((prev) =>
+                prev.map((s) => (s.id === id ? { ...s, state: 0 } : s)),
+            )
+        }
+
+        window.addEventListener("device-finished", handler)
+        return () => {
+            window.removeEventListener("device-finished", handler)
+        }
+    }, [])
+
+    useEffect(() => {
         if (networkStatus === "connecting") {
             setStatus("connecting")
             return
@@ -86,6 +100,21 @@ export function useDeviceStatusSocket() {
             ws.close()
         }
     }, [networkStatus])
+
+    useEffect(() => {
+        const handler = (e: any) => {
+            const { id } = e.detail
+
+            setStates((prev) =>
+                prev.map((s) => (s.id === id ? { ...s, state: 0 } : s)),
+            )
+        }
+
+        window.addEventListener("device-finished", handler)
+        return () => {
+            window.removeEventListener("device-finished", handler)
+        }
+    }, [])
 
     return {
         states,

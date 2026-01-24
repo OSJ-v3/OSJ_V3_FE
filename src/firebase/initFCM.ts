@@ -12,11 +12,7 @@ export async function initFCM() {
     const removeAlarm = useAlarmStore.getState().removeAlarm
     const openAlarmModal = useAlarmModalStore.getState().open
 
-    console.log("[FCM] registering foreground listener")
-
     onMessage(messaging, (payload) => {
-        console.log("[FCM foreground]", payload)
-
         const data = payload.data
         if (!data?.device_id || !data.prevAt || !data.now) return
 
@@ -33,7 +29,7 @@ export async function initFCM() {
 
         if (Notification.permission === "granted") {
             new Notification(
-                `${id}번 ${getDeviceType(id) === "WASH" ? "세탁기" : "건조기"} 종료 알림`,
+                `${id}번 ${getDeviceType(id) === "WASH" ? "세탁기" : "건조기"}`,
                 {
                     body: "작동이 완료되었습니다.",
                     tag: `device-${id}`,

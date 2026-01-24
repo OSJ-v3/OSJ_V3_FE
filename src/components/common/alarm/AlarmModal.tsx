@@ -21,8 +21,8 @@ export function AlarmModal({ onConfirm }: { onConfirm: () => void }) {
                 </Text>
 
                 <TimeRow>
-                    <Text font="heading3">작동시간</Text>
-                    <Text font="heading1">{duration}</Text>
+                    <Text font="body1">작동시간</Text>
+                    <Text font="heading2">{duration}</Text>
                 </TimeRow>
             </Content>
 
@@ -32,6 +32,9 @@ export function AlarmModal({ onConfirm }: { onConfirm: () => void }) {
 }
 
 const Card = styled.div`
+    position: fixed;
+    top: 20px;
+
     width: 90%;
     max-width: 540px;
 

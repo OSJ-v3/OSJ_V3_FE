@@ -27,16 +27,13 @@ export async function requestPermissionAndSyncToken(
         const { token: savedToken, setToken } = useFcmStore.getState()
 
         if (savedToken !== newToken) {
-            console.log("[FCM] token changed → sync")
             await syncTokenToServer(newToken)
             setToken(newToken)
         } else {
-            console.log("[FCM] token unchanged")
         }
 
         return newToken
     } catch (err) {
-        console.error("[FCM] getToken error:", err)
         return null
     }
 }
@@ -46,8 +43,6 @@ export function listenForegroundMessage() {
     const removeAlarm = useAlarmStore.getState().removeAlarm
 
     return onMessage(firebaseMessaging, (payload: MessagePayload) => {
-        console.log("[FCM foreground]", payload) // 반드시 찍히게
-
         const data = payload.data as Record<string, string> | undefined
         if (!data?.device_id || !data.prevAt || !data.now) return
 
@@ -62,15 +57,17 @@ export function listenForegroundMessage() {
             duration: calcDuration(data.prevAt, data.now),
         })
 
-        // 포그라운드에서 브라우저 알림도 원하면
+        window.dispatchEvent(
+            new CustomEvent("device-finished", {
+                detail: { id },
+            }),
+        )
+
         if (Notification.permission === "granted") {
-            new Notification(
-                `${id}번 ${getDeviceType(id) === "WASH" ? "세탁기" : "건조기"} 종료 알림`,
-                {
-                    body: `작동이 완료되었습니다.`,
-                    tag: `device-${id}`,
-                },
-            )
+            new Notification(`${id}번 ${getDeviceType(id)}`, {
+                body: "작동이 완료되었습니다.",
+                tag: `device-${id}`,
+            })
         }
     })
 }

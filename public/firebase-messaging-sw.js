@@ -6,12 +6,12 @@ importScripts(
 )
 
 firebase.initializeApp({
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID",
+    apiKey: "AIzaSyAiMkLkgVZ41qPTr-RRYSQoowEPyGWgeY4",
+    authDomain: "osj-v3.firebaseapp.com",
+    projectId: "osj-v3",
+    storageBucket: "osj-v3.firebasestorage.app",
+    messagingSenderId: "96201396002",
+    appId: "1:96201396002:web:dfbd7de6ac05d42b545f7b",
 })
 
 const messaging = firebase.messaging()
@@ -21,25 +21,30 @@ const WASHER_IDS = new Set([
     44, 45, 47, 48, 49, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
 ])
 
-function getDeviceType(id) {
-    return WASHER_IDS.has(id) ? "WASH" : "DRY"
-}
-
-messaging.onBackgroundMessage((payload) => {
+messaging.onBackgroundMessage(async (payload) => {
     const data = payload.data || {}
-    let title = "알림"
-    let body = ""
+    const id = Number(data.device_id)
 
-    if (data.device_id) {
-        const deviceId = Number(data.device_id)
-        const deviceName = getDeviceType(deviceId)
-        title = "작동 완료 알림"
-        body = `${deviceId}번 ${deviceName}가 완료되었습니다`
+    if (!Number.isNaN(id)) {
+        const clients = await self.clients.matchAll({
+            type: "window",
+            includeUncontrolled: true,
+        })
+
+        for (const client of clients) {
+            client.postMessage({
+                type: "DEVICE",
+                id,
+            })
+        }
     }
 
-    self.registration.showNotification(title, {
-        body,
-        icon: "/icon-512.png",
-        data,
-    })
+    self.registration.showNotification(
+        `${id}번 ${WASHER_IDS.has(id) ? "세탁기" : "건조기"}`,
+        {
+            body: "작동이 완료되었습니다.",
+            icon: "/icon-512.png",
+            data,
+        },
+    )
 })
