@@ -5,11 +5,6 @@ const WASHER_IDS = new Set([
     44, 45, 47, 48, 49, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
 ])
 
-const DRYER_IDS = new Set([
-    2, 4, 6, 12, 13, 14, 15, 16, 17, 24, 25, 26, 27, 28, 29, 31, 34, 38, 39, 40,
-    41, 43, 46, 50, 51, 62, 63, 64, 65, 66, 67,
-])
-
 export function mapFCMToAlarm(payload: any): Alarm | null {
     const data = payload?.data
     if (!data) return null
@@ -26,15 +21,13 @@ export function mapFCMToAlarm(payload: any): Alarm | null {
     if (data.device_id) {
         const id = Number(data.device_id)
 
-        let deviceName = "기기"
-        if (WASHER_IDS.has(id)) deviceName = "세탁기"
-        if (DRYER_IDS.has(id)) deviceName = "건조기"
+        let deviceName = WASHER_IDS.has(id) ? "세탁기" : "건조기"
 
         return {
             type: "DEVICE",
             deviceId: id,
-            title: "작동 완료 알림",
-            content: `${id}번 ${deviceName}가 완료되었습니다`,
+            title: `${id}번 ${deviceName}`,
+            content: "작동이 완료되었습니다.",
             createdAt: Date.now(),
         }
     }
