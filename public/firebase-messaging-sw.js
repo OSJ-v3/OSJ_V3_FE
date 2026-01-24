@@ -33,7 +33,7 @@ messaging.onBackgroundMessage(async (payload) => {
 
         for (const client of clients) {
             client.postMessage({
-                type: "DEVICE_FINISHED",
+                type: "DEVICE",
                 id,
             })
         }
