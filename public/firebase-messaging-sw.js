@@ -16,15 +16,19 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging()
 
+const WASHER_IDS = new Set([
+    1, 3, 5, 7, 8, 9, 10, 11, 18, 20, 21, 22, 23, 30, 32, 33, 35, 36, 37, 42,
+    44, 45, 47, 48, 49, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
+])
+
 self.addEventListener("activate", (event) => {
     event.waitUntil(self.clients.claim())
 })
 
 messaging.onBackgroundMessage(async (payload) => {
-    console.log("📦 BACKGROUND FCM", payload)
-
     const data = payload.data || {}
     const id = Number(data.device_id)
+
     if (Number.isNaN(id)) return
 
     const clients = await self.clients.matchAll({
@@ -36,14 +40,17 @@ messaging.onBackgroundMessage(async (payload) => {
         client.postMessage({
             type: "DEVICE",
             id,
-            data,
+            prevAt: data.prevAt,
+            now: data.now,
         })
     }
 
-    self.registration.showNotification(`${id}번 장비`, {
-        body: "작동이 완료되었습니다.",
-        icon: "/icon-512.png",
-        tag: `device-${id}`,
-        data,
-    })
+    self.registration.showNotification(
+        `${id}번 ${WASHER_IDS.has(id) ? "세탁기" : "건조기"}`,
+        {
+            body: "작동이 완료되었습니다.",
+            icon: "/icon-512.png",
+            data,
+        },
+    )
 })
