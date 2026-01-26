@@ -10,7 +10,7 @@ export async function initFCMTokenIfNeeded() {
 
     const permission = await Notification.requestPermission()
     if (permission !== "granted") {
-        console.log("🔕 알림 권한 거부")
+        console.log("알림 권한 거부")
         return null
     }
 
