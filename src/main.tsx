@@ -21,7 +21,7 @@ const queryClient = new QueryClient({
 
 async function bootstrap() {
     await initFCMTokenIfNeeded()
-    initFCM()
+    await initFCM()
 }
 
 bootstrap()
