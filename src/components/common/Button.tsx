@@ -2,97 +2,53 @@ import type { ComponentProps } from "react"
 import styled from "styled-components"
 import { Text } from "./Text"
 
-type KindType = "primary" | "gray"
+type ButtonVariant = "primary" | "gray"
 
 type Props = ComponentProps<"button"> & {
-    kind?: KindType
-    full?: boolean
-    height?: number | string
-    width?: number | string
-    padding?: string
-    borderRadius?: number
-    border?: string
+    variant?: ButtonVariant
+    fullWidth?: boolean
 }
 
-export const Button = ({
-    kind = "primary",
-    full = true,
-    height = 44,
-    width,
-    padding = "8px 16px",
-    borderRadius = 8,
-    border,
-    style,
+export function Button({
+    variant = "primary",
+    fullWidth = true,
     children,
     ...props
-}: Props) => {
+}: Props) {
     return (
-        <ButtonTag
-            $kind={kind}
-            $height={height}
-            $width={width}
-            $padding={padding}
-            $borderRadius={borderRadius}
-            $border={border}
-            style={{
-                width: full ? "100%" : width || "fit-content",
-                ...style,
-            }}
-            {...props}
-        >
-            <Text
-                color={
-                    kind == "primary"
-                        ? "System.OnSurface"
-                        : "System.InverseSurface"
-                }
-                font={"button1"}
-            >
-                {children}
-            </Text>
-        </ButtonTag>
+        <StyledButton $variant={variant} $fullWidth={fullWidth} {...props}>
+            {typeof children === "string" ? (
+                <Text font="button1" color="System.OnSurface">
+                    {children}
+                </Text>
+            ) : (
+                children
+            )}
+        </StyledButton>
     )
 }
 
-const ButtonTag = styled.button<{
-    $kind: "primary" | "gray"
-    $height: number | string
-    $width?: number | string
-    $padding: string
-    $borderRadius: number
-    $border?: string
+const StyledButton = styled.button<{
+    $variant: ButtonVariant
+    $fullWidth: boolean
 }>`
-    border: ${({ $border }) => $border || "none"};
+    width: ${({ $fullWidth }) => ($fullWidth ? "100%" : "fit-content")};
+    height: 44px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
     cursor: pointer;
-    border-radius: ${({ $borderRadius }) => $borderRadius}px;
-    transition: 0.2s ease;
-    display: flex;
-    justify-content: center;
+
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
 
-    height: ${({ $height }) =>
-        typeof $height === "number" ? `${$height}px` : $height};
-    width: ${({ $width }) =>
-        typeof $width === "number" ? `${$width}px` : $width || "fit-content"};
-
-    padding: ${({ $padding }) => $padding};
-    font-size: 16px;
-    font-weight: 500;
-
-    ${({ theme, $kind }) =>
-        $kind === "primary"
+    ${({ theme, $variant }) =>
+        $variant === "primary"
             ? `
-        background-color: ${theme.colors.Main.Primary};
-
-        &:hover {
-            background-color: ${theme.colors.Main.Main700};
-        }
-    `
+        background: ${theme.colors.Main.Primary};
+      `
             : `
-        background-color: ${theme.colors.Gray.Secondary};
-
-        &:hover {
-            background-color: ${theme.colors.Gray.SurfaceContainerLowest};
-        }
-    `};
+        background: ${theme.colors.Gray.Secondary};
+      `}
 `
