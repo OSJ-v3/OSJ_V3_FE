@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import styled, { css } from "styled-components"
 import { Header, Spinner, Text } from "../components"
 import ReactMarkdown from "react-markdown"
@@ -8,6 +8,7 @@ import { useEffect } from "react"
 import { useNoticeReadStore } from "../stores/useNoticeReadStore"
 
 export function Detail() {
+    const navigate = useNavigate()
     const { id } = useParams()
     const noticeId = Number(id)
 
@@ -26,7 +27,7 @@ export function Detail() {
 
     return (
         <Wrapper>
-            <Header />
+            <Header onBack={() => navigate(-1)} />
 
             <Text font={"heading3"} color="System.InverseSurface">
                 {data.title}

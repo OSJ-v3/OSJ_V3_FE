@@ -1,36 +1,27 @@
 import { ChevronLeft } from "lucide-react"
-import { useNavigate } from "react-router-dom"
-import styled, { useTheme } from "styled-components"
+import styled from "styled-components"
 import { Text } from "../Text"
 
 interface Props {
     title?: string
-    back?: boolean
+    onBack?: () => void
 }
 
-export function Header({ title = "", back = true }: Props) {
-    const navigate = useNavigate()
-    const theme = useTheme()
-
+export function Header({ title, onBack }: Props) {
     return (
         <Wrapper>
             <LeftArea>
-                {back && (
-                    <BackButton onClick={() => navigate(-1)}>
-                        <ChevronLeft
-                            size={24}
-                            color={theme.colors.Gray.SurfaceContainerHigh}
-                        />
+                {onBack && (
+                    <BackButton onClick={onBack}>
+                        <ChevronLeft size={24} />
                     </BackButton>
                 )}
             </LeftArea>
+
             <CenterArea>
-                {title && (
-                    <Text font="subTitle2" color="Gray.SurfaceContainerHigh">
-                        {title}
-                    </Text>
-                )}
+                {title && <Text font="subTitle2">{title}</Text>}
             </CenterArea>
+
             <RightArea />
         </Wrapper>
     )

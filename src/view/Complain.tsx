@@ -51,7 +51,7 @@ export function Complain() {
 
     return (
         <Wrapper>
-            <Header title="문의하기" />
+            <Header onBack={() => navigate(-1)} title="문의하기" />
 
             <InputWrapper>
                 <Dropdown
