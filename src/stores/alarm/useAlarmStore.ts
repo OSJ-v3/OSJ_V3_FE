@@ -6,7 +6,7 @@ export type AlarmDevice = {
     type: "WASH" | "DRY"
 }
 
-interface AlarmStore {
+interface AlarmState {
     alarms: AlarmDevice[]
     hasAlarm: (id: number) => boolean
     addAlarm: (device: AlarmDevice) => void
@@ -14,7 +14,7 @@ interface AlarmStore {
     setAlarms: (devices: AlarmDevice[]) => void
 }
 
-export const useAlarmStore = create<AlarmStore>()(
+export const useAlarmStore = create<AlarmState>()(
     persist(
         (set, get) => ({
             alarms: [],
@@ -22,22 +22,23 @@ export const useAlarmStore = create<AlarmStore>()(
             hasAlarm: (id) => get().alarms.some((d) => d.id === id),
 
             addAlarm: (device) =>
-                set((state) => ({
-                    alarms: [...state.alarms, device],
-                })),
+                set((state) => {
+                    if (state.alarms.some((d) => d.id === device.id)) {
+                        return state
+                    }
+                    return { alarms: [...state.alarms, device] }
+                }),
 
             removeAlarm: (id) =>
                 set((state) => ({
                     alarms: state.alarms.filter((d) => d.id !== id),
                 })),
 
-            setAlarms: (devices) =>
-                set(() => ({
-                    alarms: devices,
-                })),
+            setAlarms: (devices) => set({ alarms: devices }),
         }),
         {
             name: "alarm-store",
+            version: 1,
         },
     ),
 )
