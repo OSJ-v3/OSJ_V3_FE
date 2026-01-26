@@ -1,9 +1,8 @@
-import type { DeviceData } from "../components"
-import type { LayoutCell } from "../components"
+import type { DeviceData, LayoutCell } from "../../components"
 
 export function useDevices(
     layout: LayoutCell[][],
-    forceSkeleton?: boolean
+    forceSkeleton?: boolean,
 ): DeviceData[] {
     if (forceSkeleton) return []
 

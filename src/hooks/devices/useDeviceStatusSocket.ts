@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { useNetworkStore } from "../stores/useNetworkStore"
+import { useNetworkStore } from "../../stores"
 
 export interface DeviceState {
     id: number
