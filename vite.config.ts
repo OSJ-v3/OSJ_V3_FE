@@ -9,7 +9,9 @@ export default defineConfig({
             strategies: "injectManifest",
             srcDir: "public",
             filename: "firebase-messaging-sw.js",
+
             registerType: "autoUpdate",
+            injectRegister: null,
 
             includeAssets: [
                 "icons/favicon.ico",
