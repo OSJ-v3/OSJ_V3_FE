@@ -7,7 +7,12 @@ import { initFCM } from "./firebase/initFCM"
 import { initFCMTokenIfNeeded } from "./firebase/initFCMToken"
 
 if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/firebase-messaging-sw.js")
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js", {
+            scope: "/",
+            updateViaCache: "none",
+        })
+    })
 }
 
 const queryClient = new QueryClient({

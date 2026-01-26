@@ -6,7 +6,7 @@ importScripts(
 )
 
 firebase.initializeApp({
-    apiKey: "AIzaSyAiMkLkgVZ41qPTr-RRYSQoowEPyGWgeY4",
+    apiKey: "AIzaSy...",
     authDomain: "osj-v3.firebaseapp.com",
     projectId: "osj-v3",
     storageBucket: "osj-v3.firebasestorage.app",
@@ -16,27 +16,21 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging()
 
-const WASHER_IDS = new Set([
-    1, 3, 5, 7, 8, 9, 10, 11, 18, 20, 21, 22, 23, 30, 32, 33, 35, 36, 37, 42,
-    44, 45, 47, 48, 49, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-])
+self.addEventListener("activate", (event) => {
+    event.waitUntil(self.clients.claim())
+})
 
 messaging.onBackgroundMessage(async (payload) => {
     const data = payload.data || {}
     const id = Number(data.device_id)
 
-    if (!Number.isNaN(id)) {
-        const clients = await self.clients.matchAll({
-            type: "window",
-            includeUncontrolled: true,
-        })
+    const clients = await self.clients.matchAll({
+        type: "window",
+        includeUncontrolled: true,
+    })
 
-        for (const client of clients) {
-            client.postMessage({
-                type: "DEVICE",
-                id,
-            })
-        }
+    for (const client of clients) {
+        client.postMessage({ type: "DEVICE", id })
     }
 
     self.registration.showNotification(
