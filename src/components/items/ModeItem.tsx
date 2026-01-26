@@ -1,6 +1,6 @@
 import { Check } from "lucide-react"
 import styled, { useTheme } from "styled-components"
-import { Text } from "../common/Text"
+import { Text } from "../common"
 
 interface ModeItemProps<T extends string> {
     label: string

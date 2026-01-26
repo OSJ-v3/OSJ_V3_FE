@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import { Button, Text } from ".."
-import { useAlarmModalStore } from "../../../stores/useAlarmModalStore"
+import { useAlarmModalStore } from "../../../stores"
 
 export function AlarmModal({ onConfirm }: { onConfirm: () => void }) {
     const data = useAlarmModalStore((s) => s.data)

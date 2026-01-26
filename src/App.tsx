@@ -1,14 +1,17 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { ThemeProvider } from "styled-components"
-import { ToastProvider } from "./contexts"
-import { useSystemTheme, useThemeColor } from "./hooks"
+import { Splash, AlarmRenderer, ToastRenderer, Notice } from "./components"
+import { ToastProvider } from "./contexts/ToastContext"
+import {
+    useSystemTheme,
+    useThemeColor,
+    useInitNoticePush,
+    useSyncAlarmFromServer,
+    useNetworkListener,
+} from "./hooks"
 import { useThemeStore } from "./stores"
 import { darkTheme, lightTheme, GlobalStyle, AppLayout } from "./styles"
-import { Main, Setting, Complain, Detail, Notice } from "./view"
-import { useNetworkListener } from "./hooks/useNetworkListener"
-import { AlarmRenderer, Splash, ToastRenderer } from "./components/common"
-import { useInitNoticePush } from "./hooks/useInitNoticePush"
-import { useSyncAlarmFromServer } from "./hooks/useSyncAlarmFromServer"
+import { Main, Setting, Complain, Detail } from "./view"
 
 function App() {
     const { mode } = useThemeStore()

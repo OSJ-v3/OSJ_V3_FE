@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react"
-import { useToast } from "../hooks/useToast"
+import { useToast } from "../hooks"
 
 const ToastContext = createContext<ReturnType<typeof useToast> | null>(null)
 

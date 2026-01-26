@@ -1,6 +1,6 @@
 import styled, { useTheme } from "styled-components"
-import { MessageIcon } from "../../assets/icons/message"
-import { Text } from "../common/Text"
+import { MessageIcon } from "../../assets"
+import { Text } from "../common"
 
 interface Props {
     title: string

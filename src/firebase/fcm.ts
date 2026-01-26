@@ -1,10 +1,7 @@
 import { getToken, onMessage, type MessagePayload } from "firebase/messaging"
+import { useFcmStore, useAlarmModalStore, useAlarmStore } from "../stores"
+import { getDeviceType, calcDuration } from "../utils"
 import { getFirebaseMessaging } from "./firebase"
-import { useAlarmStore } from "../stores"
-import { useAlarmModalStore } from "../stores/useAlarmModalStore"
-import { useFcmStore } from "../stores/useFcmStore"
-import { calcDuration } from "../utils/calcDuration"
-import { getDeviceType } from "../utils/deviceType"
 
 export async function requestPermissionAndSyncToken(
     syncTokenToServer: (token: string) => Promise<void>,
@@ -45,11 +42,7 @@ export async function listenForegroundMessage() {
     const messaging = await getFirebaseMessaging()
     if (!messaging) return
 
-    console.log("🔥 FOREGROUND FCM LISTENER ATTACHED")
-
     onMessage(messaging, (payload: MessagePayload) => {
-        console.log("🔥 FOREGROUND FCM", payload)
-
         const data = payload.data
         if (!data?.device_id || !data.prevAt || !data.now) return
 
