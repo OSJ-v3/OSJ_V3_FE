@@ -6,12 +6,7 @@ export default defineConfig({
     plugins: [
         react(),
         VitePWA({
-            strategies: "injectManifest",
-            srcDir: "public",
-            filename: "firebase-messaging-sw.js",
-
-            registerType: "autoUpdate",
-            injectRegister: null,
+            disable: true,
 
             includeAssets: [
                 "icons/favicon.ico",
