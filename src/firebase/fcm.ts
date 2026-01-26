@@ -51,6 +51,7 @@ export async function listenForegroundMessage() {
     return onMessage(messaging, (payload: MessagePayload) => {
         const data = payload.data as Record<string, string> | undefined
         if (!data?.device_id || !data.prevAt || !data.now) return
+        console.log("FOREGROUND FCM", payload)
 
         const id = Number(data.device_id)
         if (Number.isNaN(id)) return

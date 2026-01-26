@@ -5,6 +5,7 @@ import "./styles/global.css"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { initFCM } from "./firebase/initFCM"
 import { initFCMTokenIfNeeded } from "./firebase/initFCMToken"
+import { listenForegroundMessage } from "./firebase/fcm"
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
@@ -27,6 +28,7 @@ const queryClient = new QueryClient({
 async function bootstrap() {
     await initFCMTokenIfNeeded()
     await initFCM()
+    await listenForegroundMessage()
 }
 
 bootstrap()
