@@ -1,19 +1,19 @@
-import { getMessaging, onMessage } from "firebase/messaging"
-import { firebaseApp } from "./firebase"
+import { onMessage } from "firebase/messaging"
+import { getFirebaseMessaging } from "./firebase"
 import { useAlarmStore } from "../stores/useAlarmStore"
 import { useAlarmModalStore } from "../stores/useAlarmModalStore"
 import { calcDuration } from "../utils/calcDuration"
 import { getDeviceType } from "../utils/deviceType"
 
 export async function initFCM() {
-    await navigator.serviceWorker.ready
+    const messaging = await getFirebaseMessaging()
+    if (!messaging) return
 
-    const messaging = getMessaging(firebaseApp)
     const removeAlarm = useAlarmStore.getState().removeAlarm
     const openAlarmModal = useAlarmModalStore.getState().open
 
     onMessage(messaging, (payload) => {
-        const data = payload.data
+        const data = payload.data as Record<string, string> | undefined
         if (!data?.device_id || !data.prevAt || !data.now) return
 
         const id = Number(data.device_id)
@@ -33,7 +33,6 @@ export async function initFCM() {
                 {
                     body: "작동이 완료되었습니다.",
                     tag: `device-${id}`,
-                    data: { deviceId: id },
                 },
             )
         }
