@@ -45,16 +45,19 @@ export async function listenForegroundMessage() {
     const messaging = await getFirebaseMessaging()
     if (!messaging) return
 
-    const openAlarmModal = useAlarmModalStore.getState().open
-    const removeAlarm = useAlarmStore.getState().removeAlarm
+    console.log("🔥 FOREGROUND FCM LISTENER ATTACHED")
 
-    return onMessage(messaging, (payload: MessagePayload) => {
-        const data = payload.data as Record<string, string> | undefined
+    onMessage(messaging, (payload: MessagePayload) => {
+        console.log("🔥 FOREGROUND FCM", payload)
+
+        const data = payload.data
         if (!data?.device_id || !data.prevAt || !data.now) return
-        console.log("FOREGROUND FCM", payload)
 
         const id = Number(data.device_id)
         if (Number.isNaN(id)) return
+
+        const openAlarmModal = useAlarmModalStore.getState().open
+        const removeAlarm = useAlarmStore.getState().removeAlarm
 
         removeAlarm(id)
 
@@ -63,12 +66,6 @@ export async function listenForegroundMessage() {
             type: getDeviceType(id),
             duration: calcDuration(data.prevAt, data.now),
         })
-
-        window.dispatchEvent(
-            new CustomEvent("device-finished", {
-                detail: { id },
-            }),
-        )
 
         if (Notification.permission === "granted") {
             new Notification(
