@@ -1,5 +1,5 @@
 import type { LayoutCell, DeviceData } from "../../components"
-import type { DeviceState } from "./useDeviceStatusSocket"
+import type { DeviceState } from "../../domains/devices"
 
 export function useDevicesSocket(
     layout: LayoutCell[][],

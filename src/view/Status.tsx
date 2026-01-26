@@ -7,13 +7,13 @@ import {
     DeviceLayout,
 } from "../components"
 import {
-    type DeviceState,
     useMinSkeleton,
     useNetworkRenderState,
     useDevicesSocket,
 } from "../hooks"
 import { maleSchoolLayout, maleDormLayout, femaleLayout } from "../layouts"
 import { useAreaStore, useNetworkStore } from "../stores"
+import type { DeviceState } from "../domains/devices"
 
 interface Props {
     states: DeviceState[]

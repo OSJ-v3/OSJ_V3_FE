@@ -9,11 +9,8 @@ import {
 import styled from "styled-components"
 import { Status } from "./Status"
 import { useStartStore, useAlarmStore, useNetworkStore } from "../stores"
-import {
-    useDeviceStatusSocket,
-    useMinSkeleton,
-    useNetworkRenderState,
-} from "../hooks"
+import { useMinSkeleton, useNetworkRenderState } from "../hooks"
+import { useDeviceStatusSocket } from "../domains/devices"
 
 export function Main() {
     const { start } = useStartStore()
