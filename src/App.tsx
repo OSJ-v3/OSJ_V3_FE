@@ -9,8 +9,6 @@ import { useNetworkListener } from "./hooks/useNetworkListener"
 import { AlarmRenderer, Splash, ToastRenderer } from "./components/common"
 import { useInitNoticePush } from "./hooks/useInitNoticePush"
 import { useSyncAlarmFromServer } from "./hooks/useSyncAlarmFromServer"
-import { useEffect } from "react"
-import { initFCM } from "./firebase/initFCM"
 
 function App() {
     const { mode } = useThemeStore()
@@ -26,10 +24,6 @@ function App() {
               : lightTheme
 
     useThemeColor(appliedTheme.colors.Surface)
-
-    useEffect(() => {
-        initFCM()
-    }, [])
 
     return (
         <BrowserRouter>
