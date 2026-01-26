@@ -21,8 +21,11 @@ self.addEventListener("activate", (event) => {
 })
 
 messaging.onBackgroundMessage(async (payload) => {
+    console.log("📦 BACKGROUND FCM", payload)
+
     const data = payload.data || {}
     const id = Number(data.device_id)
+    if (Number.isNaN(id)) return
 
     const clients = await self.clients.matchAll({
         type: "window",
@@ -30,15 +33,17 @@ messaging.onBackgroundMessage(async (payload) => {
     })
 
     for (const client of clients) {
-        client.postMessage({ type: "DEVICE", id })
+        client.postMessage({
+            type: "DEVICE",
+            id,
+            data,
+        })
     }
 
-    self.registration.showNotification(
-        `${id}번 ${WASHER_IDS.has(id) ? "세탁기" : "건조기"}`,
-        {
-            body: "작동이 완료되었습니다.",
-            icon: "/icon-512.png",
-            data,
-        },
-    )
+    self.registration.showNotification(`${id}번 장비`, {
+        body: "작동이 완료되었습니다.",
+        icon: "/icon-512.png",
+        tag: `device-${id}`,
+        data,
+    })
 })
