@@ -2,21 +2,17 @@ import { useAlarmStore, useAlarmModalStore } from "../stores"
 import { calcDuration } from "../utils/calcDuration"
 import { getDeviceType } from "../utils/deviceType"
 
-interface DevicePayload {
-    device_id: string
-    prevAt: string
-    now: string
-}
-
 export function bindServiceWorkerMessage() {
     if (!("serviceWorker" in navigator)) return
 
     navigator.serviceWorker.addEventListener("message", (e) => {
-        const { type, payload } = e.data || {}
-        if (type !== "DEVICE") return
+        if (!document.hidden) return
 
-        const data = payload as DevicePayload
-        const id = Number(data.device_id)
+        if (!e.data) return
+        const { type, payload } = e.data
+        if (type !== "DEVICE" || !payload) return
+
+        const id = Number(payload.device_id)
         if (Number.isNaN(id)) return
 
         useAlarmStore.getState().removeAlarm(id)
@@ -24,7 +20,7 @@ export function bindServiceWorkerMessage() {
         useAlarmModalStore.getState().open({
             id,
             type: getDeviceType(id),
-            duration: calcDuration(data.prevAt, data.now),
+            duration: calcDuration(payload.prevAt, payload.now),
         })
     })
 }
