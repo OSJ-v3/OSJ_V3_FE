@@ -1,10 +1,10 @@
+import { getToken, onMessage, type MessagePayload } from "firebase/messaging"
+import { getFirebaseMessaging } from "./firebase"
 import { useAlarmStore } from "../stores"
 import { useAlarmModalStore } from "../stores/useAlarmModalStore"
 import { useFcmStore } from "../stores/useFcmStore"
 import { calcDuration } from "../utils/calcDuration"
 import { getDeviceType } from "../utils/deviceType"
-import { firebaseMessaging } from "./firebase"
-import { getToken, onMessage, type MessagePayload } from "firebase/messaging"
 
 export async function requestPermissionAndSyncToken(
     syncTokenToServer: (token: string) => Promise<void>,
@@ -15,9 +15,12 @@ export async function requestPermissionAndSyncToken(
         const permission = await Notification.requestPermission()
         if (permission !== "granted") return null
 
+        const messaging = await getFirebaseMessaging()
+        if (!messaging) return null
+
         const registration = await navigator.serviceWorker.ready
 
-        const newToken = await getToken(firebaseMessaging, {
+        const newToken = await getToken(messaging, {
             vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
             serviceWorkerRegistration: registration,
         })
@@ -29,25 +32,32 @@ export async function requestPermissionAndSyncToken(
         if (savedToken !== newToken) {
             await syncTokenToServer(newToken)
             setToken(newToken)
-        } else {
         }
 
         return newToken
     } catch (err) {
+        console.error("FCM token sync failed", err)
         return null
     }
 }
 
-export function listenForegroundMessage() {
-    const openAlarmModal = useAlarmModalStore.getState().open
-    const removeAlarm = useAlarmStore.getState().removeAlarm
+export async function listenForegroundMessage() {
+    const messaging = await getFirebaseMessaging()
+    if (!messaging) return
 
-    return onMessage(firebaseMessaging, (payload: MessagePayload) => {
-        const data = payload.data as Record<string, string> | undefined
+    console.log("🔥 FOREGROUND FCM LISTENER ATTACHED")
+
+    onMessage(messaging, (payload: MessagePayload) => {
+        console.log("🔥 FOREGROUND FCM", payload)
+
+        const data = payload.data
         if (!data?.device_id || !data.prevAt || !data.now) return
 
         const id = Number(data.device_id)
         if (Number.isNaN(id)) return
+
+        const openAlarmModal = useAlarmModalStore.getState().open
+        const removeAlarm = useAlarmStore.getState().removeAlarm
 
         removeAlarm(id)
 
@@ -57,17 +67,14 @@ export function listenForegroundMessage() {
             duration: calcDuration(data.prevAt, data.now),
         })
 
-        window.dispatchEvent(
-            new CustomEvent("device-finished", {
-                detail: { id },
-            }),
-        )
-
         if (Notification.permission === "granted") {
-            new Notification(`${id}번 ${getDeviceType(id)}`, {
-                body: "작동이 완료되었습니다.",
-                tag: `device-${id}`,
-            })
+            new Notification(
+                `${id}번 ${getDeviceType(id) === "WASH" ? "세탁기" : "건조기"}`,
+                {
+                    body: "작동이 완료되었습니다.",
+                    tag: `device-${id}`,
+                },
+            )
         }
     })
 }

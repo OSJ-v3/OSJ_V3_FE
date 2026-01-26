@@ -1,30 +1,30 @@
 import { getToken } from "firebase/messaging"
-import { firebaseMessaging } from "./firebase"
+import { getFirebaseMessaging } from "./firebase"
 import { useFcmStore } from "../stores/useFcmStore"
 
 export async function initFCMTokenIfNeeded() {
-    const { token, setToken } = useFcmStore.getState()
-
-    if (token) return token
+    if (!("Notification" in window)) return null
 
     const permission = await Notification.requestPermission()
-    if (permission !== "granted") {
-        console.log("알림 권한 거부됨")
-        return null
-    }
+    if (permission !== "granted") return null
+
+    const messaging = await getFirebaseMessaging()
+    if (!messaging) return null
 
     const registration = await navigator.serviceWorker.ready
 
-    const newToken = await getToken(firebaseMessaging, {
+    const token = await getToken(messaging, {
         vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
         serviceWorkerRegistration: registration,
     })
 
-    if (newToken) {
-        setToken(newToken)
-        return newToken
+    if (!token) return null
+
+    const { token: savedToken, setToken } = useFcmStore.getState()
+
+    if (savedToken !== token) {
+        setToken(token)
     }
 
-    console.log("❌ FCM 토큰 발급 실패")
-    return null
+    return token
 }
