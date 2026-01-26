@@ -18,7 +18,14 @@ export function Button({
     return (
         <StyledButton $variant={variant} $fullWidth={fullWidth} {...props}>
             {typeof children === "string" ? (
-                <Text font="button1" color="System.OnSurface">
+                <Text
+                    font="button1"
+                    color={
+                        variant === "primary"
+                            ? "System.OnSurface"
+                            : "System.InverseSurface"
+                    }
+                >
                     {children}
                 </Text>
             ) : (
