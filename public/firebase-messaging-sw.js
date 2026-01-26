@@ -50,3 +50,5 @@ messaging.onBackgroundMessage(async (payload) => {
         },
     )
 })
+
+self.__WB_MANIFEST
