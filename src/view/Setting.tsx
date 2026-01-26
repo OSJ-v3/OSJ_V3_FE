@@ -31,7 +31,7 @@ export function Setting() {
     return (
         <>
             <Wrapper>
-                <Header title="설정" />
+                <Header onBack={() => navigate(-1)} title="설정" />
 
                 <ItemWrapper>
                     <SettingItem

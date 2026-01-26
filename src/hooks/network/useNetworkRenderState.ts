@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import type { NetworkStatus } from "../stores"
+import type { NetworkStatus } from "../../stores"
 
 interface Params {
     status: NetworkStatus

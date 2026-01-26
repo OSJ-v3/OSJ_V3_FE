@@ -2,7 +2,7 @@ import { BellIcon } from "../../../assets"
 import { useNavigate } from "react-router-dom"
 import styled, { useTheme } from "styled-components"
 import { useNotices } from "../../../apis/notice"
-import { useNoticeReadStore } from "../../../stores/useNoticeReadStore"
+import { useNoticeReadStore } from "../../../stores"
 
 export function Notice() {
     const theme = useTheme()

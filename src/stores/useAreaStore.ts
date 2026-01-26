@@ -16,6 +16,7 @@ export const useAreaStore = create<AreaState>()(
         }),
         {
             name: "area-storage",
-        }
-    )
+            version: 1,
+        },
+    ),
 )

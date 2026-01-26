@@ -1,8 +1,7 @@
-import { useToastContext } from "../../contexts"
-import { useAlarmStore } from "../../stores"
-import { BottomSheet, Button } from "../common"
 import { instance } from "../../apis"
-import { useFcmStore } from "../../stores/useFcmStore"
+import { useToastContext } from "../../contexts/ToastContext"
+import { useAlarmStore, useFcmStore } from "../../stores"
+import { BottomSheet, Button } from "../common"
 
 interface Props {
     device: {
@@ -94,7 +93,7 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
                 onClose={onClose}
                 actions={
                     <>
-                        <Button kind="gray" onClick={onClose}>
+                        <Button variant="gray" onClick={onClose}>
                             취소
                         </Button>
                         <Button onClick={handleRemoveAlarm}>알림 해제</Button>
@@ -112,7 +111,7 @@ export function DeviceAlarmSheet({ device, onClose }: Props) {
                 onClose={onClose}
                 actions={
                     <>
-                        <Button kind="gray" onClick={onClose}>
+                        <Button variant="gray" onClick={onClose}>
                             취소
                         </Button>
                         <Button onClick={handleAddAlarm}>알림 설정</Button>

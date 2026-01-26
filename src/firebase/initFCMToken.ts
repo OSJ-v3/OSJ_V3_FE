@@ -1,6 +1,6 @@
 import { getToken } from "firebase/messaging"
 import { getFirebaseMessaging } from "./firebase"
-import { useFcmStore } from "../stores/useFcmStore"
+import { useFcmStore } from "../stores"
 
 export async function initFCMTokenIfNeeded() {
     if (!("Notification" in window)) return null

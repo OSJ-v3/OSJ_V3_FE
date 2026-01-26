@@ -1,7 +1,7 @@
 export const lightColors = {
     Surface: "#FFFFFF",
     Main: {
-        PrimaryContainer: "#eef8ff",
+        PrimaryContainer: "#e4f4ff",
         Main100: "#B3DFFF",
         Main200: "#80CAFF",
         PrimaryFixed: "#4DB4FF",
@@ -13,7 +13,7 @@ export const lightColors = {
         OnPrimary: "#0065FF",
     },
     Gray: {
-        Secondary: "#f6f6f6",
+        Secondary: "#efefef",
         SurfaceContainerLowest: "#DDDCDD",
         SurfaceDim: "#C6C5C7",
         SurfaceTint: "#AFADB1",
@@ -29,9 +29,9 @@ export const lightColors = {
         OnSurface: "#ffffff",
     },
     Sub: {
-        OnTertiary: "#f0ffeb",
+        OnTertiary: "#e8ffe1",
         Tertiary: "#62AE55",
-        onError: "#fff6f6",
+        onError: "#ffeded",
         Error: "#FF3B32",
     },
 }

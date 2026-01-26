@@ -1,11 +1,11 @@
-import type { DeviceData, LayoutCell } from "../components"
-import type { DeviceState } from "./useDeviceStatusSocket"
+import type { LayoutCell, DeviceData } from "../../components"
+import type { DeviceState } from "../../domains/devices"
 
 export function useDevicesSocket(
     layout: LayoutCell[][],
     states: DeviceState[],
     range: [number, number],
-    forceSkeleton?: boolean
+    forceSkeleton?: boolean,
 ): DeviceData[] {
     if (forceSkeleton) {
         return layout
@@ -44,7 +44,7 @@ export function useDevicesSocket(
                         type: cell.device.deviceType,
                         state:
                             id >= range[0] && id <= range[1]
-                                ? stateMap.get(id) ?? 2
+                                ? (stateMap.get(id) ?? 2)
                                 : 2,
                     },
                 ]
@@ -55,7 +55,7 @@ export function useDevicesSocket(
                 type: d.deviceType,
                 state:
                     d.id >= range[0] && d.id <= range[1]
-                        ? stateMap.get(d.id) ?? 2
+                        ? (stateMap.get(d.id) ?? 2)
                         : 2,
             }))
         })

@@ -1,9 +1,9 @@
-import { css, styled } from "styled-components"
-import { Header, Input, Button, Dropdown } from "../components"
 import { useState } from "react"
-import { useInquiry } from "../apis/inquiry"
-import { useToastContext } from "../contexts"
 import { useNavigate } from "react-router-dom"
+import styled, { css } from "styled-components"
+import { useInquiry } from "../apis/inquiry"
+import { Header, Dropdown, Input, Button } from "../components"
+import { useToastContext } from "../contexts/ToastContext"
 
 type Category = "BUG" | "IMPROVEMENT" | "ETC"
 
@@ -51,7 +51,7 @@ export function Complain() {
 
     return (
         <Wrapper>
-            <Header title="문의하기" />
+            <Header onBack={() => navigate(-1)} title="문의하기" />
 
             <InputWrapper>
                 <Dropdown

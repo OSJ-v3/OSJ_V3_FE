@@ -1,4 +1,4 @@
-import { TriangleIcon } from "../../../assets/icons/triangle"
+import { TriangleIcon } from "../../../assets"
 import styled, { useTheme } from "styled-components"
 import { DeviceColumn, type DeviceData } from ".."
 

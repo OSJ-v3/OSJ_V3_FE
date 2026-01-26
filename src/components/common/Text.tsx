@@ -1,7 +1,8 @@
 import type { ComponentProps } from "react"
-import styled, { type DefaultTheme } from "styled-components"
+import styled from "styled-components"
 import { type fontsKeyOfType, Fonts } from "../../styles"
 import type { Colors } from "../../types/theme"
+import { resolveColor } from "../../utils"
 
 type MainKeys = keyof Colors["Main"]
 type GrayKeys = keyof Colors["Gray"]
@@ -34,23 +35,8 @@ const StyledText = styled.span<{
 }>`
     white-space: pre-line;
     ${({ $font }) => fontToCss($font)};
-    color: ${({ theme, $color }) => {
-        const colors = theme.colors as DefaultTheme["colors"]
-        const parts = $color.split(".")
-
-        if (parts.length === 1) {
-            const group = parts[0] as keyof typeof colors
-            return colors[group]
-        }
-
-        const [group, key] = parts
-        const groupObj = colors[group as keyof typeof colors]
-
-        if (typeof groupObj === "string") return groupObj
-        if (key in groupObj) return (groupObj as Record<string, string>)[key]
-
-        return colors.System.OnSurface
-    }};
+    color: ${({ theme, $color }) =>
+        resolveColor(theme.colors, $color) ?? theme.colors.System.OnSurface};
 `
 
 export const Text = ({

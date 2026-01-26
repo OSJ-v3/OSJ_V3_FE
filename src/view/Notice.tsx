@@ -14,7 +14,7 @@ export function Notice() {
 
     return (
         <Wrapper>
-            <Header title="공지사항" />
+            <Header onBack={() => navigate(-1)} title="공지사항" />
 
             {data?.map((v) => (
                 <NoticeItem

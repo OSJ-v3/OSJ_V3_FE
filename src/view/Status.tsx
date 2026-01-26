@@ -1,19 +1,19 @@
+import { useState } from "react"
 import styled from "styled-components"
 import {
-    AreaSelector,
-    DeviceLayout,
     NetworkError,
+    AreaSelector,
     SkeletonDeviceLayout,
+    DeviceLayout,
 } from "../components"
 import {
     useMinSkeleton,
-    useDevicesSocket,
     useNetworkRenderState,
+    useDevicesSocket,
 } from "../hooks"
-import { femaleLayout, maleDormLayout, maleSchoolLayout } from "../layouts"
+import { maleSchoolLayout, maleDormLayout, femaleLayout } from "../layouts"
 import { useAreaStore, useNetworkStore } from "../stores"
-import type { DeviceState } from "../hooks/useDeviceStatusSocket"
-import { useState } from "react"
+import type { DeviceState } from "../domains/devices"
 
 interface Props {
     states: DeviceState[]

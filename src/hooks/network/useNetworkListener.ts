@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useNetworkStore } from "../stores/useNetworkStore"
+import { useNetworkStore } from "../../stores"
 
 const SOCKET_URL = import.meta.env.VITE_WS_BASE_URL
 const TIMEOUT = 3000

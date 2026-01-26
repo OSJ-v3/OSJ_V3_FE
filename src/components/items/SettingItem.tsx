@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 import { ChevronRight } from "lucide-react"
-import { Text } from "../common/Text"
+import { Text } from "../common"
 import styled, { useTheme } from "styled-components"
 
 interface Props {
