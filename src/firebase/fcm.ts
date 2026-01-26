@@ -59,15 +59,5 @@ export async function listenForegroundMessage() {
             type: getDeviceType(id),
             duration: calcDuration(data.prevAt, data.now),
         })
-
-        if (Notification.permission === "granted") {
-            new Notification(
-                `${id}번 ${getDeviceType(id) === "WASH" ? "세탁기" : "건조기"}`,
-                {
-                    body: "작동이 완료되었습니다.",
-                    tag: `device-${id}`,
-                },
-            )
-        }
     })
 }
