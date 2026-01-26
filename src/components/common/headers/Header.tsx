@@ -1,5 +1,5 @@
 import { ChevronLeft } from "lucide-react"
-import styled from "styled-components"
+import styled, { useTheme } from "styled-components"
 import { Text } from "../Text"
 
 interface Props {
@@ -8,12 +8,17 @@ interface Props {
 }
 
 export function Header({ title, onBack }: Props) {
+    const theme = useTheme()
+
     return (
         <Wrapper>
             <LeftArea>
                 {onBack && (
                     <BackButton onClick={onBack}>
-                        <ChevronLeft size={24} />
+                        <ChevronLeft
+                            color={theme.colors.System.InverseSurface}
+                            size={24}
+                        />
                     </BackButton>
                 )}
             </LeftArea>

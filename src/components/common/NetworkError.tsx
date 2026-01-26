@@ -8,10 +8,10 @@ export function NetworkError() {
     return (
         <Container>
             <IconWrapper $theme={theme}>
-                <DisconnectIcon fill="Gray.SurfaceContainerLow" width={120} />
+                <DisconnectIcon fill="Gray.SurfaceContainerLow" width={100} />
             </IconWrapper>
 
-            <Text font="heading3" color="Gray.SurfaceContainerLow">
+            <Text font="body1" color="Gray.SurfaceContainerLow">
                 네트워크 연결이 끊겼습니다.
             </Text>
         </Container>
@@ -25,7 +25,7 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 24px;
+    gap: 36px;
 `
 
 const IconWrapper = styled.div<{ $theme: any }>`
