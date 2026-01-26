@@ -19,20 +19,19 @@ if ("serviceWorker" in navigator) {
 }
 
 if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.addEventListener("message", (event) => {
-        const { type, id, prevAt, now } = event.data || {}
+    navigator.serviceWorker.addEventListener("message", (e) => {
+        const { type, payload } = e.data || {}
+        if (type !== "DEVICE") return
 
-        if (type !== "DEVICE" || typeof id !== "number") return
+        const id = Number(payload.device_id)
+        if (Number.isNaN(id)) return
 
-        const removeAlarm = useAlarmStore.getState().removeAlarm
-        const openAlarmModal = useAlarmModalStore.getState().open
+        useAlarmStore.getState().removeAlarm(id)
 
-        removeAlarm(id)
-
-        openAlarmModal({
+        useAlarmModalStore.getState().open({
             id,
             type: getDeviceType(id),
-            duration: prevAt && now ? calcDuration(prevAt, now) : "작동 완료",
+            duration: calcDuration(payload.prevAt, payload.now),
         })
     })
 }

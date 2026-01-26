@@ -29,8 +29,6 @@ messaging.onBackgroundMessage(async (payload) => {
     const data = payload.data || {}
     const id = Number(data.device_id)
 
-    if (Number.isNaN(id)) return
-
     const clients = await self.clients.matchAll({
         type: "window",
         includeUncontrolled: true,
@@ -39,9 +37,7 @@ messaging.onBackgroundMessage(async (payload) => {
     for (const client of clients) {
         client.postMessage({
             type: "DEVICE",
-            id,
-            prevAt: data.prevAt,
-            now: data.now,
+            payload: data,
         })
     }
 
