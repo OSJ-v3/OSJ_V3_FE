@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useAlarmStore } from "../stores/useAlarmStore"
+import { useAlarmStore } from "../../stores"
 
 export function useInitNoticePush() {
     const removeAlarm = useAlarmStore((s) => s.removeAlarm)
