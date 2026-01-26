@@ -25,6 +25,12 @@ self.addEventListener("activate", (event) => {
     event.waitUntil(self.clients.claim())
 })
 
+self.addEventListener("notificationclick", (event) => {
+    event.notification.close()
+
+    event.waitUntil(clients.openWindow("/"))
+})
+
 messaging.onBackgroundMessage(async (payload) => {
     const data = payload.data || {}
     const id = Number(data.device_id)
