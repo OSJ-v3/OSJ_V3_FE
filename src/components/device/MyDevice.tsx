@@ -19,7 +19,7 @@ export function MyDevice({ id, type, state }: IProps) {
 
     const getStateColor = (
         theme: any,
-        state: 0 | 1 | 2 | 3
+        state: 0 | 1 | 2 | 3,
     ): { background: string; text: ColorKey } => {
         switch (state) {
             case 0:
@@ -56,10 +56,10 @@ export function MyDevice({ id, type, state }: IProps) {
         state == 0
             ? "작동중"
             : state == 1
-            ? "사용 가능"
-            : state == 2
-            ? "연결끊김"
-            : "고장"
+              ? "사용 가능"
+              : state == 2
+                ? "연결끊김"
+                : "고장"
 
     return (
         <>
@@ -69,8 +69,14 @@ export function MyDevice({ id, type, state }: IProps) {
             >
                 <img
                     width={120}
+                    height={120}
                     src={type === "WASH" ? Images.Washer : Images.Dryer}
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
+                    alt={`${id}번 ${type === "WASH" ? "세탁기" : "건조기"}`}
                 />
+
                 <Text font={"subTitle2"}>
                     {id}번 {type === "WASH" ? "세탁기" : "건조기"}
                 </Text>
