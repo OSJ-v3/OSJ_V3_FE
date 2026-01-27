@@ -13,61 +13,55 @@ import {
 } from "../hooks"
 import { maleSchoolLayout, maleDormLayout, femaleLayout } from "../layouts"
 import { useAreaStore, useNetworkStore } from "../stores"
-import { useDeviceStatusSocket } from "../domains/devices"
-
-interface Props {
-    loading: boolean
-    error: boolean
-}
 
 const AREA_CONFIG = {
     "남자 학교측": {
         layout: maleSchoolLayout,
-        range: [1, 25] as readonly [number, number],
+        range: [1, 25] as const,
     },
     "남자 기숙사측": {
         layout: maleDormLayout,
-        range: [26, 51] as readonly [number, number],
+        range: [26, 51] as const,
     },
     여자: {
         layout: femaleLayout,
-        range: [52, 67] as readonly [number, number],
+        range: [52, 67] as const,
     },
 }
 
-export function Status({ loading }: Props) {
+interface Props {
+    loading: boolean
+    socket: {
+        stateMap: Map<number, 0 | 1 | 2 | 3>
+        version: number
+        error: boolean
+    }
+}
+
+export function Status({ loading, socket }: Props) {
     const { area } = useAreaStore()
     const { status } = useNetworkStore()
     const [present, setPresent] = useState(area)
 
-    const {
-        stateMap,
-        version,
-        loading: socketLoading,
-        error: socketError,
-    } = useDeviceStatusSocket()
-
-    const showSkeleton = useMinSkeleton(loading || socketLoading, 500)
+    const showSkeleton = useMinSkeleton(loading, 500)
 
     const renderState = useNetworkRenderState({
         status,
-        loading: loading || socketLoading,
+        loading,
         showSkeleton,
     })
-
-    const isSkeleton = renderState === "skeleton"
 
     const { layout, range } = AREA_CONFIG[present]
 
     const devices = useDevicesSocket(
         layout,
-        stateMap,
-        version,
+        socket.stateMap,
+        socket.version,
         range,
-        isSkeleton,
+        renderState === "skeleton",
     )
 
-    if (renderState === "error" || socketError) {
+    if (renderState === "error" || socket.error) {
         return (
             <ErrorFill>
                 <NetworkError />
@@ -93,7 +87,6 @@ export function Status({ loading }: Props) {
 const ErrorFill = styled.div`
     width: 100%;
     min-height: 80vh;
-
     display: flex;
     align-items: center;
     justify-content: center;
