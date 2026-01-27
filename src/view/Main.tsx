@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, useMemo } from "react"
+import { useRef, useState, useEffect } from "react"
 import {
     HeaderTabBar,
     Text,
@@ -16,64 +16,32 @@ export function Main() {
     const { start } = useStartStore()
     const { alarms } = useAlarmStore()
     const { status } = useNetworkStore()
+
     const [tab, setTab] = useState<"mine" | "status">(start)
     const mineRef = useRef<HTMLDivElement>(null)
     const statusRef = useRef<HTMLDivElement>(null)
     const [height, setHeight] = useState<number>(0)
 
-    const { states, loading, error } = useDeviceStatusSocket()
-    const stateMap = useMemo(
-        () => new Map(states.map((s) => [s.id, s.state])),
-        [states],
-    )
-    const showSkeleton = useMinSkeleton(loading, 500)
+    const socket = useDeviceStatusSocket()
+
+    const showSkeleton = useMinSkeleton(socket.loading, 500)
 
     const renderState = useNetworkRenderState({
         status,
-        loading,
+        loading: socket.loading,
         showSkeleton,
     })
 
-    useLayoutEffect(() => {
-        const target = tab === "mine" ? mineRef.current : statusRef.current
-        if (!target) return
-
-        const updateHeight = () => {
+    useEffect(() => {
+        requestAnimationFrame(() => {
+            const target = tab === "mine" ? mineRef.current : statusRef.current
+            if (!target) return
             setHeight(target.scrollHeight)
-        }
-
-        updateHeight()
-
-        const observer = new ResizeObserver(updateHeight)
-        observer.observe(target)
-
-        return () => observer.disconnect()
-    }, [tab])
-
-    const touchStartX = useRef<number | null>(null)
-
-    const onTouchStart = (e: React.TouchEvent) => {
-        touchStartX.current = e.touches[0].clientX
-    }
-
-    const onTouchEnd = (e: React.TouchEvent) => {
-        if (touchStartX.current === null) return
-
-        const diff = e.changedTouches[0].clientX - touchStartX.current
-
-        if (diff > 50 && tab === "status") {
-            setTab("mine")
-        }
-
-        if (diff < -50 && tab === "mine") {
-            setTab("status")
-        }
-
-        touchStartX.current = null
-    }
+        })
+    }, [tab, renderState])
 
     return (
-        <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <Wrapper>
             <HeaderTabBar value={tab} onChange={setTab} />
 
             <SlideContainer $height={height}>
@@ -110,18 +78,14 @@ export function Main() {
                                         key={`${d.type}-${d.id}`}
                                         id={d.id}
                                         type={d.type}
-                                        state={stateMap.get(d.id) ?? 2}
+                                        state={socket.stateMap.get(d.id) ?? 2}
                                     />
                                 ))}
                         </DeviceGrid>
                     </SlidePage>
 
                     <SlidePage ref={statusRef}>
-                        <Status
-                            states={states}
-                            loading={loading}
-                            error={error}
-                        />
+                        <Status loading={socket.loading} socket={socket} />
                     </SlidePage>
                 </SlideTrack>
             </SlideContainer>
@@ -132,7 +96,7 @@ export function Main() {
 const SlideContainer = styled.div<{ $height: number }>`
     width: 100%;
     overflow: hidden;
-    height: ${({ $height }) => `${$height}px`};
+    height: ${({ $height }) => ($height === 0 ? "auto" : `${$height}px`)};
     transition: height 0.2s ease;
 `
 
@@ -149,8 +113,6 @@ const SlidePage = styled.div`
     width: 50%;
     flex-shrink: 0;
     display: flex;
-    justify-content: start;
-    align-items: start;
     flex-direction: column;
     gap: 28px;
 `
@@ -160,34 +122,26 @@ const Wrapper = styled.div`
     min-height: calc(100dvh - 20px);
     touch-action: pan-y;
     display: flex;
-    justify-content: start;
-    align-items: start;
     flex-direction: column;
     gap: 28px;
 `
 
 const TextContainer = styled.div`
-    width: 100%;
     display: flex;
-    justify-items: start;
-    align-items: start;
     flex-direction: column;
     gap: 14px;
 `
 
 const DeviceGrid = styled.div`
-    width: 100%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
     padding-bottom: 40px;
-    overflow: hidden;
 `
 
 const NetworkFill = styled.div`
     grid-column: 1 / -1;
     min-height: calc(100vh - 380px);
-
     display: flex;
     align-items: center;
     justify-content: center;

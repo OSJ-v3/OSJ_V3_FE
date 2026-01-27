@@ -6,78 +6,56 @@ type SocketStatus = "connecting" | "connected" | "error"
 
 const SOCKET_URL = import.meta.env.VITE_WS_BASE_URL
 
+function isDeviceState(value: any): value is DeviceState["state"] {
+    return value === 0 || value === 1 || value === 2 || value === 3
+}
+
 export function useDeviceStatusSocket() {
     const networkStatus = useNetworkStore((s) => s.status)
 
-    const [states, setStates] = useState<DeviceState[]>([])
+    const stateMapRef = useRef<Map<number, DeviceState["state"]>>(new Map())
+    const [version, setVersion] = useState(0)
     const [status, setStatus] = useState<SocketStatus>("connecting")
-    const socketRef = useRef<WebSocket | null>(null)
 
     useEffect(() => {
         if (networkStatus !== "online") {
-            socketRef.current?.close()
-            socketRef.current = null
-            setStates([])
+            stateMapRef.current.clear()
             setStatus("error")
             return
         }
 
         const ws = new WebSocket(SOCKET_URL)
-        socketRef.current = ws
         setStatus("connecting")
 
         ws.onopen = () => setStatus("connected")
 
         ws.onmessage = (e) => {
-            try {
-                const data = JSON.parse(e.data)
-                setStates((prev) => normalizeDeviceStates(prev, data))
-            } catch {}
+            const data = JSON.parse(e.data)
+            let changed = false
+            const map = stateMapRef.current
+
+            const apply = (d: any) => {
+                if (typeof d?.id === "number" && isDeviceState(d.state)) {
+                    if (map.get(d.id) !== d.state) {
+                        map.set(d.id, d.state)
+                        changed = true
+                    }
+                }
+            }
+
+            Array.isArray(data) ? data.forEach(apply) : apply(data)
+
+            if (changed) setVersion((v) => v + 1)
         }
 
-        ws.onerror = ws.onclose = () => {
-            setStatus("error")
-        }
-
-        return () => {
-            ws.close()
-        }
+        ws.onerror = ws.onclose = () => setStatus("error")
+        return () => ws.close()
     }, [networkStatus])
 
-    useEffect(() => {
-        const handler = (e: CustomEvent<{ id: number }>) => {
-            setStates((prev) =>
-                prev.map((s) =>
-                    s.id === e.detail.id ? { ...s, state: 0 } : s,
-                ),
-            )
-        }
-
-        window.addEventListener("device-finished", handler as EventListener)
-        return () =>
-            window.removeEventListener(
-                "device-finished",
-                handler as EventListener,
-            )
-    }, [])
-
     return {
-        states,
-        ready: status === "connected",
+        stateMap: stateMapRef.current,
+        version,
         loading: status === "connecting",
         error: status === "error",
     }
-}
-
-function normalizeDeviceStates(prev: DeviceState[], data: any): DeviceState[] {
-    if (Array.isArray(data)) return data
-
-    if (typeof data?.id === "number") {
-        const map = new Map(prev.map((s) => [s.id, s.state]))
-        map.set(data.id, data.state)
-
-        return Array.from(map, ([id, state]) => ({ id, state }))
-    }
-
-    return prev
 }
