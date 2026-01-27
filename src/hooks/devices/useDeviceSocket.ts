@@ -1,17 +1,16 @@
 import { useMemo } from "react"
 import type { LayoutCell, DeviceData } from "../../components"
-import type { DeviceState } from "../../domains/devices"
+
+type DeviceStateValue = DeviceData["state"]
 
 export function useDevicesSocket(
     layout: LayoutCell[][],
-    states: DeviceState[] | undefined,
-    range: readonly [number, number] | undefined,
+    stateMap: Map<number, DeviceStateValue>,
+    version: number,
+    range: readonly [number, number],
     forceSkeleton?: boolean,
 ): DeviceData[] {
     return useMemo(() => {
-        if (!range) return []
-        if (!states && !forceSkeleton) return []
-
         const cells = layout.flat().filter((c) => c.type !== "empty")
 
         if (forceSkeleton) {
@@ -33,7 +32,6 @@ export function useDevicesSocket(
         }
 
         const [min, max] = range
-        const stateMap = new Map(states!.map((s) => [s.id, s.state]))
 
         return cells.flatMap((cell) =>
             cell.type === "single"
@@ -56,5 +54,5 @@ export function useDevicesSocket(
                               : 2,
                   })),
         )
-    }, [layout, states, range, forceSkeleton])
+    }, [layout, range, forceSkeleton, version])
 }

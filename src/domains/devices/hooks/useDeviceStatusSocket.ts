@@ -6,8 +6,8 @@ type SocketStatus = "connecting" | "connected" | "error"
 
 const SOCKET_URL = import.meta.env.VITE_WS_BASE_URL
 
-function isDeviceState(v: any): v is DeviceState["state"] {
-    return v === 0 || v === 1 || v === 2 || v === 3
+function isDeviceState(value: any): value is DeviceState["state"] {
+    return value === 0 || value === 1 || value === 2 || value === 3
 }
 
 export function useDeviceStatusSocket() {
@@ -33,14 +33,8 @@ export function useDeviceStatusSocket() {
             try {
                 const data = JSON.parse(e.data)
                 let changed = false
-                const map = stateMapRef.current
 
-                const apply = (id: number, state: DeviceState["state"]) => {
-                    if (map.get(id) !== state) {
-                        map.set(id, state)
-                        changed = true
-                    }
-                }
+                const map = stateMapRef.current
 
                 if (Array.isArray(data)) {
                     for (const d of data) {
@@ -48,21 +42,27 @@ export function useDeviceStatusSocket() {
                             typeof d?.id === "number" &&
                             isDeviceState(d.state)
                         ) {
-                            apply(d.id, d.state)
+                            if (map.get(d.id) !== d.state) {
+                                map.set(d.id, d.state)
+                                changed = true
+                            }
                         }
                     }
                 } else if (
                     typeof data?.id === "number" &&
                     isDeviceState(data.state)
                 ) {
-                    apply(data.id, data.state)
+                    if (map.get(data.id) !== data.state) {
+                        map.set(data.id, data.state)
+                        changed = true
+                    }
                 }
 
                 if (changed) {
                     setVersion((v) => v + 1)
                 }
             } catch {
-                /* ignore */
+                // 무시
             }
         }
 
@@ -71,26 +71,9 @@ export function useDeviceStatusSocket() {
         return () => ws.close()
     }, [networkStatus])
 
-    useEffect(() => {
-        const handler = (e: CustomEvent<{ id: number }>) => {
-            const map = stateMapRef.current
-            if (map.get(e.detail.id) !== 0) {
-                map.set(e.detail.id, 0)
-                setVersion((v) => v + 1)
-            }
-        }
-
-        window.addEventListener("device-finished", handler as EventListener)
-        return () =>
-            window.removeEventListener(
-                "device-finished",
-                handler as EventListener,
-            )
-    }, [])
-
     return {
         stateMap: stateMapRef.current,
-        version, // 렌더 트리거용
+        version, // 🔥 의존성용
         ready: status === "connected",
         loading: status === "connecting",
         error: status === "error",
