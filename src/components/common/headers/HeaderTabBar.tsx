@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import styled, { useTheme } from "styled-components"
 import { SettingIcon } from "../../../assets"
 import { LaundryTabSwitch, Notice } from ".."
+import { useCallback } from "react"
 
 type Option = "mine" | "status"
 
@@ -15,11 +16,13 @@ export function HeaderTabBar({
     const theme = useTheme()
     const navigate = useNavigate()
 
+    const goSetting = useCallback(() => {
+        navigate("/setting")
+    }, [navigate])
+
     return (
-        <HeaderWrapper role="navigation" aria-label="메인 상단 메뉴">
-            <TabArea role="tablist" aria-label="세탁기 상태 탭">
-                <LaundryTabSwitch value={value} onChange={onChange} />
-            </TabArea>
+        <HeaderWrapper as="header" aria-label="상단 탭 및 설정 영역">
+            <LaundryTabSwitch value={value} onChange={onChange} />
 
             <RightButtons>
                 <Notice />
@@ -27,11 +30,13 @@ export function HeaderTabBar({
                 <IconButton
                     type="button"
                     aria-label="설정 화면으로 이동"
-                    onClick={() => navigate("/setting")}
+                    onClick={goSetting}
                 >
                     <SettingIcon
+                        role="button"
+                        aria-label="설정"
+                        tabIndex={0}
                         color={theme.colors.Gray.OnSecondary}
-                        aria-hidden="true"
                     />
                 </IconButton>
             </RightButtons>
@@ -39,18 +44,13 @@ export function HeaderTabBar({
     )
 }
 
-const HeaderWrapper = styled.header`
+const HeaderWrapper = styled.div`
     width: 100%;
     height: 57px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
-`
-
-const TabArea = styled.div`
-    display: flex;
-    align-items: center;
 `
 
 const RightButtons = styled.div`
@@ -62,12 +62,19 @@ const RightButtons = styled.div`
 const IconButton = styled.button`
     all: unset;
     cursor: pointer;
+
     display: flex;
     align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
 
     &:focus-visible {
         outline: 2px solid ${({ theme }) => theme.colors.Main.Primary};
-        outline-offset: 4px;
-        border-radius: 6px;
+        outline-offset: 2px;
+    }
+
+    &:active {
+        opacity: 0.7;
     }
 `
