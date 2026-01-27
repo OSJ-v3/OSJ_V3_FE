@@ -15,16 +15,18 @@ export const useStartStore = create<StartPageState>()(
         (set) => ({
             start: "mine",
             isLoading: true,
+            hydrated: false,
 
             setStart: (page) => set({ start: page }),
             setLoading: (loading) => set({ isLoading: loading }),
         }),
         {
             name: "area-storage",
+            partialize: (state) => ({ start: state.start }),
 
-            partialize: (state) => ({
-                start: state.start,
-            }),
+            onRehydrateStorage: () => (state) => {
+                state?.setLoading(false)
+            },
         },
     ),
 )
