@@ -28,8 +28,40 @@ const ToastRenderer = lazy(() =>
     import("./components").then((m) => ({ default: m.ToastRenderer })),
 )
 
+function DeferredUI() {
+    const [ready, setReady] = useState(false)
+
+    useEffect(() => {
+        const id = requestIdleCallback(() => setReady(true))
+        return () => cancelIdleCallback(id)
+    }, [])
+
+    if (!ready) return null
+
+    return (
+        <Suspense fallback={null}>
+            <AlarmRenderer />
+            <ToastRenderer />
+        </Suspense>
+    )
+}
+
+function DeferredEffects() {
+    useEffect(() => {
+        const id = requestIdleCallback(() => {
+            useInitNoticePush()
+            useSyncAlarmFromServer()
+            useNetworkListener()
+        })
+
+        return () => cancelIdleCallback(id)
+    }, [])
+
+    return null
+}
+
 function App() {
-    const { mode } = useThemeStore()
+    const mode = useThemeStore((s) => s.mode)
     const systemTheme = useSystemTheme()
 
     const appliedTheme =
@@ -55,26 +87,10 @@ function App() {
     )
 }
 
-function DeferredEffects() {
-    useInitNoticePush()
-    useSyncAlarmFromServer()
-    useNetworkListener()
-    return null
-}
-
 function AppInner() {
-    const [mounted, setMounted] = useState(false)
-
-    useEffect(() => {
-        setMounted(true)
-    }, [])
-
     return (
         <>
-            <Suspense fallback={null}>
-                <AlarmRenderer />
-                <ToastRenderer />
-            </Suspense>
+            <DeferredUI />
 
             <AppLayout>
                 <Suspense fallback={<Splash />}>
@@ -84,14 +100,14 @@ function AppInner() {
                             element={
                                 <>
                                     <Main />
-                                    {mounted && <DeferredEffects />}
+                                    <DeferredEffects />
                                 </>
                             }
                         />
                         <Route path="/notice" element={<Notice />} />
+                        <Route path="/notice/:id" element={<Detail />} />
                         <Route path="/setting" element={<Setting />} />
                         <Route path="/complain" element={<Complain />} />
-                        <Route path="/notice/:id" element={<Detail />} />
                     </Routes>
                 </Suspense>
             </AppLayout>
