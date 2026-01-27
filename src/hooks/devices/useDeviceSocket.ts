@@ -4,11 +4,14 @@ import type { DeviceState } from "../../domains/devices"
 
 export function useDevicesSocket(
     layout: LayoutCell[][],
-    states: DeviceState[],
-    range: [number, number],
+    states: DeviceState[] | undefined,
+    range: [number, number] | undefined,
     forceSkeleton?: boolean,
 ): DeviceData[] {
     return useMemo(() => {
+        if (!range) return []
+        if (!states && !forceSkeleton) return []
+
         const cells = layout.flat().filter((c) => c.type !== "empty")
 
         if (forceSkeleton) {
@@ -29,8 +32,8 @@ export function useDevicesSocket(
             )
         }
 
-        const stateMap = new Map(states.map((s) => [s.id, s.state]))
         const [min, max] = range
+        const stateMap = new Map(states!.map((s) => [s.id, s.state]))
 
         return cells.flatMap((cell) =>
             cell.type === "single"

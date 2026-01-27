@@ -21,11 +21,8 @@ export function Main() {
     const statusRef = useRef<HTMLDivElement>(null)
     const [height, setHeight] = useState<number>(0)
 
-    const { states, loading, error } = useDeviceStatusSocket()
-    const stateMap = useMemo(
-        () => new Map(states.map((s) => [s.id, s.state])),
-        [states],
-    )
+    const { stateMap, version, loading, error } = useDeviceStatusSocket()
+
     const showSkeleton = useMinSkeleton(loading, 500)
 
     const renderState = useNetworkRenderState({
@@ -71,6 +68,15 @@ export function Main() {
 
         touchStartX.current = null
     }
+
+    const statusStates = useMemo(
+        () =>
+            Array.from(stateMap.entries()).map(([id, state]) => ({
+                id,
+                state,
+            })),
+        [stateMap, version],
+    )
 
     return (
         <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
@@ -118,7 +124,7 @@ export function Main() {
 
                     <SlidePage ref={statusRef}>
                         <Status
-                            states={states}
+                            states={statusStates}
                             loading={loading}
                             error={error}
                         />

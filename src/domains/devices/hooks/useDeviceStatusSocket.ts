@@ -6,69 +6,81 @@ type SocketStatus = "connecting" | "connected" | "error"
 
 const SOCKET_URL = import.meta.env.VITE_WS_BASE_URL
 
-function isDeviceState(value: any): value is DeviceState["state"] {
-    return value === 0 || value === 1 || value === 2 || value === 3
+function isDeviceState(v: any): v is DeviceState["state"] {
+    return v === 0 || v === 1 || v === 2 || v === 3
 }
 
 export function useDeviceStatusSocket() {
     const networkStatus = useNetworkStore((s) => s.status)
 
-    const [states, setStates] = useState<DeviceState[]>([])
+    const stateMapRef = useRef<Map<number, DeviceState["state"]>>(new Map())
+    const [version, setVersion] = useState(0)
     const [status, setStatus] = useState<SocketStatus>("connecting")
-    const socketRef = useRef<WebSocket | null>(null)
 
     useEffect(() => {
         if (networkStatus !== "online") {
-            socketRef.current?.close()
-            socketRef.current = null
-            setStates([])
+            stateMapRef.current.clear()
             setStatus("error")
             return
         }
 
         const ws = new WebSocket(SOCKET_URL)
-        socketRef.current = ws
         setStatus("connecting")
 
-        ws.onopen = () => {
-            setStatus("connected")
-        }
+        ws.onopen = () => setStatus("connected")
 
         ws.onmessage = (e) => {
             try {
                 const data = JSON.parse(e.data)
+                let changed = false
+                const map = stateMapRef.current
 
-                setStates((prev) => normalizeDeviceStates(prev, data))
+                const apply = (id: number, state: DeviceState["state"]) => {
+                    if (map.get(id) !== state) {
+                        map.set(id, state)
+                        changed = true
+                    }
+                }
+
+                if (Array.isArray(data)) {
+                    for (const d of data) {
+                        if (
+                            typeof d?.id === "number" &&
+                            isDeviceState(d.state)
+                        ) {
+                            apply(d.id, d.state)
+                        }
+                    }
+                } else if (
+                    typeof data?.id === "number" &&
+                    isDeviceState(data.state)
+                ) {
+                    apply(data.id, data.state)
+                }
+
+                if (changed) {
+                    setVersion((v) => v + 1)
+                }
             } catch {
-                // 무시
+                /* ignore */
             }
         }
 
-        ws.onerror = () => {
-            setStatus("error")
-        }
+        ws.onerror = ws.onclose = () => setStatus("error")
 
-        ws.onclose = () => {
-            setStatus("error")
-        }
-
-        return () => {
-            ws.close()
-            socketRef.current = null
-        }
+        return () => ws.close()
     }, [networkStatus])
 
     useEffect(() => {
         const handler = (e: CustomEvent<{ id: number }>) => {
-            setStates((prev) =>
-                prev.map((s) =>
-                    s.id === e.detail.id ? { ...s, state: 0 } : s,
-                ),
-            )
+            const map = stateMapRef.current
+            if (map.get(e.detail.id) !== 0) {
+                map.set(e.detail.id, 0)
+                setVersion((v) => v + 1)
+            }
         }
 
         window.addEventListener("device-finished", handler as EventListener)
-
         return () =>
             window.removeEventListener(
                 "device-finished",
@@ -77,30 +89,10 @@ export function useDeviceStatusSocket() {
     }, [])
 
     return {
-        states,
+        stateMap: stateMapRef.current,
+        version, // 렌더 트리거용
         ready: status === "connected",
         loading: status === "connecting",
         error: status === "error",
     }
-}
-
-function normalizeDeviceStates(prev: DeviceState[], data: any): DeviceState[] {
-    if (Array.isArray(data)) {
-        return data.filter(
-            (d) => typeof d?.id === "number" && isDeviceState(d.state),
-        )
-    }
-
-    if (typeof data?.id === "number" && isDeviceState(data.state)) {
-        const map = new Map(prev.map((s) => [s.id, s]))
-
-        map.set(data.id, {
-            id: data.id,
-            state: data.state,
-        })
-
-        return Array.from(map.values())
-    }
-
-    return prev
 }
