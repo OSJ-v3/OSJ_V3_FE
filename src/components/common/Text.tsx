@@ -19,6 +19,7 @@ export type ColorKey =
 type Props = ComponentProps<"span"> & {
     font?: fontsKeyOfType
     color?: ColorKey
+    ariaLabel?: string
 }
 
 const fontToCss = (font: fontsKeyOfType) => {
@@ -26,6 +27,7 @@ const fontToCss = (font: fontsKeyOfType) => {
     return `
         font-size: ${style.fontSize};
         font-weight: ${style.fontWeight};
+        line-height: ${style.lineHeight};
     `
 }
 
@@ -42,11 +44,17 @@ const StyledText = styled.span<{
 export const Text = ({
     font = "body1",
     color = "System.InverseSurface",
+    ariaLabel,
     children,
     ...props
 }: Props) => {
     return (
-        <StyledText $font={font} $color={color} {...props}>
+        <StyledText
+            $font={font}
+            $color={color}
+            aria-label={ariaLabel}
+            {...props}
+        >
             {children}
         </StyledText>
     )
