@@ -6,6 +6,10 @@ type SocketStatus = "connecting" | "connected" | "error"
 
 const SOCKET_URL = import.meta.env.VITE_WS_BASE_URL
 
+function isDeviceState(value: any): value is DeviceState["state"] {
+    return value === 0 || value === 1 || value === 2 || value === 3
+}
+
 export function useDeviceStatusSocket() {
     const networkStatus = useNetworkStore((s) => s.status)
 
@@ -26,21 +30,31 @@ export function useDeviceStatusSocket() {
         socketRef.current = ws
         setStatus("connecting")
 
-        ws.onopen = () => setStatus("connected")
+        ws.onopen = () => {
+            setStatus("connected")
+        }
 
         ws.onmessage = (e) => {
             try {
                 const data = JSON.parse(e.data)
+
                 setStates((prev) => normalizeDeviceStates(prev, data))
-            } catch {}
+            } catch {
+                // 무시
+            }
         }
 
-        ws.onerror = ws.onclose = () => {
+        ws.onerror = () => {
+            setStatus("error")
+        }
+
+        ws.onclose = () => {
             setStatus("error")
         }
 
         return () => {
             ws.close()
+            socketRef.current = null
         }
     }, [networkStatus])
 
@@ -54,6 +68,7 @@ export function useDeviceStatusSocket() {
         }
 
         window.addEventListener("device-finished", handler as EventListener)
+
         return () =>
             window.removeEventListener(
                 "device-finished",
@@ -70,13 +85,21 @@ export function useDeviceStatusSocket() {
 }
 
 function normalizeDeviceStates(prev: DeviceState[], data: any): DeviceState[] {
-    if (Array.isArray(data)) return data
+    if (Array.isArray(data)) {
+        return data.filter(
+            (d) => typeof d?.id === "number" && isDeviceState(d.state),
+        )
+    }
 
-    if (typeof data?.id === "number") {
-        const map = new Map(prev.map((s) => [s.id, s.state]))
-        map.set(data.id, data.state)
+    if (typeof data?.id === "number" && isDeviceState(data.state)) {
+        const map = new Map(prev.map((s) => [s.id, s]))
 
-        return Array.from(map, ([id, state]) => ({ id, state }))
+        map.set(data.id, {
+            id: data.id,
+            state: data.state,
+        })
+
+        return Array.from(map.values())
     }
 
     return prev
