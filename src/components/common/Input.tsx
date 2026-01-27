@@ -1,5 +1,5 @@
-import type { ComponentProps } from "react"
-import styled, { useTheme } from "styled-components"
+import { useId, type ComponentProps } from "react"
+import styled, { css } from "styled-components"
 import { Text } from "./Text"
 
 type Props = ComponentProps<"input"> & {
@@ -14,23 +14,28 @@ export const Input = ({
     style,
     ...props
 }: Props) => {
-    const theme = useTheme()
+    const id = useId()
 
     return (
         <InputFrame style={style}>
             {label && (
-                <Text font="subTitle2" color="System.InverseSurface">
-                    {label}
-                </Text>
+                <Label htmlFor={id}>
+                    <Text font="subTitle2" color="System.InverseSurface">
+                        {label}
+                    </Text>
+                </Label>
             )}
 
-            <InputLabel $theme={theme}>
+            <InputWrapper>
                 {variant === "textarea" ? (
-                    <TextareaContent {...(props as any)} $theme={theme} />
+                    <TextareaContent
+                        id={id}
+                        {...(props as ComponentProps<"textarea">)}
+                    />
                 ) : (
-                    <InputContent {...props} type={type} $theme={theme} />
+                    <InputContent id={id} type={type} {...props} />
                 )}
-            </InputLabel>
+            </InputWrapper>
         </InputFrame>
     )
 }
@@ -42,7 +47,11 @@ const InputFrame = styled.div`
     width: 100%;
 `
 
-const sharedInputStyles = `
+const Label = styled.label`
+    cursor: text;
+`
+
+const sharedInputStyles = css`
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -51,43 +60,37 @@ const sharedInputStyles = `
     background: none;
     resize: none;
 
-    &:focus {
+    color: ${({ theme }) => theme.colors.System.InverseSurface};
+
+    &::placeholder {
+        color: ${({ theme }) => theme.colors.Gray.OnSecondary};
+    }
+
+    &:focus-visible {
         outline: none;
     }
 `
 
-const InputContent = styled.input<{ $theme: any }>`
-    ${sharedInputStyles};
-    color: ${({ $theme }) => $theme.colors.System.InverseSurface};
-
-    &::placeholder {
-        color: ${({ $theme }) => $theme.colors.Gray.OnSecondary};
-    }
-`
-
-const TextareaContent = styled.textarea<{ $theme: any }>`
-    ${sharedInputStyles};
-    height: 400px;
-    color: ${({ $theme }) => $theme.colors.System.InverseSurface};
-
-    &::placeholder {
-        color: ${({ $theme }) => $theme.colors.Gray.OnSecondary};
-    }
-`
-
-const InputLabel = styled.label<{ $theme: any }>`
+const InputWrapper = styled.div`
     display: flex;
-    gap: 10px;
     align-items: center;
     padding: 16px;
     border-radius: 12px;
-    transition: 200ms;
+    transition: border-color 0.2s ease;
 
-    background-color: ${({ $theme }) => $theme.colors.Gray.Secondary};
-    border: 1px solid
-        ${({ $theme }) => $theme.colors.Gray.SurfaceContainerLowest};
+    background-color: ${({ theme }) => theme.colors.Gray.Secondary};
+    border: 1px solid ${({ theme }) => theme.colors.Gray.SurfaceContainerLowest};
 
     &:focus-within {
-        border: 1px solid ${({ $theme }) => $theme.colors.Main.Primary};
+        border-color: ${({ theme }) => theme.colors.Main.Primary};
     }
+`
+
+const InputContent = styled.input`
+    ${sharedInputStyles};
+`
+
+const TextareaContent = styled.textarea`
+    ${sharedInputStyles};
+    height: 400px;
 `
