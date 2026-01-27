@@ -78,11 +78,21 @@ export function Main() {
                 <SlideTrack $tab={tab}>
                     <SlidePage ref={mineRef}>
                         <TextContainer>
-                            <Text font="heading2">
+                            <Text
+                                as="h1"
+                                font="heading2"
+                                role="heading"
+                                aria-level={1}
+                                style={{
+                                    fontSize: "24px",
+                                    fontWeight: 700,
+                                }}
+                            >
                                 알림 설정한
                                 <br />
                                 세탁기와 건조기
                             </Text>
+
                             <Text font="body1" color="Gray.OnSecondary">
                                 알림을 설정하여 세탁기와 건조기를
                                 <br />
@@ -93,7 +103,11 @@ export function Main() {
                         <DeviceGrid>
                             {renderState === "skeleton" &&
                                 Array.from({ length: 6 }).map((_, i) => (
-                                    <SkeletonMyDevice key={i} />
+                                    <SkeletonMyDevice
+                                        key={i}
+                                        aria-hidden="true"
+                                        data-nosnippet
+                                    />
                                 ))}
 
                             {renderState === "error" && (
