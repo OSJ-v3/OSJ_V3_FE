@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import styled from "styled-components"
 import {
     NetworkError,
@@ -14,6 +14,7 @@ import {
 import { maleSchoolLayout, maleDormLayout, femaleLayout } from "../layouts"
 import { useAreaStore, useNetworkStore } from "../stores"
 import type { DeviceState } from "../domains/devices"
+import type { DeviceData } from "../components"
 
 interface Props {
     states: DeviceState[]
@@ -53,7 +54,29 @@ export function Status({ states, loading }: Props) {
 
     const { layout, range } = AREA_CONFIG[present]
 
-    const devices = useDevicesSocket(layout, states, range, isSkeleton)
+    const stateMap = useMemo(() => {
+        const map = new Map<number, DeviceData["state"]>()
+        for (const s of states) {
+            map.set(s.id, s.state)
+        }
+        return map
+    }, [states])
+
+    const version = useMemo(() => {
+        let v = 0
+        for (const s of states) {
+            v = (v * 31 + s.id * 7 + s.state) | 0
+        }
+        return v
+    }, [states])
+
+    const devices = useDevicesSocket(
+        layout,
+        stateMap,
+        version,
+        range,
+        isSkeleton,
+    )
 
     if (renderState === "error") {
         return (
