@@ -12,7 +12,7 @@ import {
 } from "../components"
 import { useThemeStore, useAreaStore, useStartStore } from "../stores"
 
-export function Setting() {
+export default function Setting() {
     const theme = useTheme()
     const navigate = useNavigate()
     const { mode, setMode } = useThemeStore()

@@ -38,7 +38,7 @@ interface Props {
     }
 }
 
-export function Status({ loading, socket }: Props) {
+export default function Status({ loading, socket }: Props) {
     const { area } = useAreaStore()
     const { status } = useNetworkStore()
     const [present, setPresent] = useState(area)

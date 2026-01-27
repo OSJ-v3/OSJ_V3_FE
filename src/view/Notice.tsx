@@ -4,7 +4,7 @@ import { Header, Spinner, NoticeItem } from "../components"
 import { useNotices } from "../apis/notice"
 import { useNoticeReadStore } from "../stores/useNoticeReadStore"
 
-export function Notice() {
+export default function Notice() {
     const navigate = useNavigate()
     const { data, isLoading, error } = useNotices()
     const isRead = useNoticeReadStore((s) => s.isRead)

@@ -7,12 +7,12 @@ import {
     NetworkError,
 } from "../components"
 import styled from "styled-components"
-import { Status } from "./Status"
+import Status from "./Status"
 import { useStartStore, useAlarmStore, useNetworkStore } from "../stores"
 import { useMinSkeleton, useNetworkRenderState } from "../hooks"
 import { useDeviceStatusSocket } from "../domains/devices"
 
-export function Main() {
+export default function Main() {
     const { start } = useStartStore()
     const { alarms } = useAlarmStore()
     const { status } = useNetworkStore()

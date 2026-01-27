@@ -7,7 +7,7 @@ import { useToastContext } from "../contexts/ToastContext"
 
 type Category = "BUG" | "IMPROVEMENT" | "ETC"
 
-export function Complain() {
+export default function Complain() {
     const { showToast } = useToastContext()
     const navigate = useNavigate()
 
