@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { ThemeProvider } from "styled-components"
-import { lazy, Suspense, useEffect, useState } from "react"
+import { lazy, Suspense } from "react"
 
 import { Splash } from "./components"
 import { ToastProvider } from "./contexts/ToastContext"
@@ -28,13 +28,6 @@ const AlarmRenderer = lazy(() =>
 const ToastRenderer = lazy(() =>
     import("./components").then((m) => ({ default: m.ToastRenderer })),
 )
-
-function BackgroundInit() {
-    useInitNoticePush()
-    useSyncAlarmFromServer()
-    useNetworkListener()
-    return null
-}
 
 function App() {
     const { mode } = useThemeStore()
@@ -64,26 +57,21 @@ function App() {
 }
 
 function AppInner() {
-    const { isLoading } = useStartStore()
-    const [enableBackground, setEnableBackground] = useState(false)
+    const isLoading = useStartStore((s) => s.isLoading)
 
-    useEffect(() => {
-        const id = requestIdleCallback(() => {
-            setEnableBackground(true)
-        })
-        return () => cancelIdleCallback(id)
-    }, [])
+    useInitNoticePush()
+    useSyncAlarmFromServer()
+    useNetworkListener()
+
+    if (isLoading) {
+        return <Splash />
+    }
 
     return (
         <>
-            {isLoading && <Splash />}
-
-            {enableBackground && <BackgroundInit />}
-
-            <Suspense fallback={null}>
-                <AlarmRenderer />
-                <ToastRenderer />
-            </Suspense>
+            <GlobalStyle />
+            <AlarmRenderer />
+            <ToastRenderer />
 
             <AppLayout>
                 <Suspense fallback={null}>
