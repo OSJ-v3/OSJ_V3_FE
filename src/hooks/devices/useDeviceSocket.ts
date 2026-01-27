@@ -5,7 +5,7 @@ import type { DeviceState } from "../../domains/devices"
 export function useDevicesSocket(
     layout: LayoutCell[][],
     states: DeviceState[] | undefined,
-    range: [number, number] | undefined,
+    range: readonly [number, number] | undefined,
     forceSkeleton?: boolean,
 ): DeviceData[] {
     return useMemo(() => {
