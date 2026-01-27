@@ -1,4 +1,4 @@
-import { useRef, useState, useLayoutEffect } from "react"
+import { useRef, useState, useLayoutEffect, useCallback, useMemo } from "react"
 import {
     HeaderTabBar,
     Text,
@@ -12,22 +12,24 @@ import { useStartStore, useAlarmStore, useNetworkStore } from "../stores"
 import { useMinSkeleton, useNetworkRenderState } from "../hooks"
 import { useDeviceStatusSocket } from "../domains/devices"
 
+const SKELETON_COUNT = 6
+
 export default function Main() {
-    const { start } = useStartStore()
-    const { alarms } = useAlarmStore()
-    const { status } = useNetworkStore()
+    const start = useStartStore((s) => s.start)
+    const alarms = useAlarmStore((s) => s.alarms)
+    const networkStatus = useNetworkStore((s) => s.status)
 
     const [tab, setTab] = useState<"mine" | "status">(start)
+
     const mineRef = useRef<HTMLDivElement>(null)
     const statusRef = useRef<HTMLDivElement>(null)
-    const [height, setHeight] = useState<number>(0)
+    const [height, setHeight] = useState<number | null>(null)
 
     const socket = useDeviceStatusSocket()
-
     const showSkeleton = useMinSkeleton(socket.loading, 500)
 
     const renderState = useNetworkRenderState({
-        status,
+        status: networkStatus,
         loading: socket.loading,
         showSkeleton,
     })
@@ -37,7 +39,8 @@ export default function Main() {
         if (!target) return
 
         const updateHeight = () => {
-            setHeight(target.scrollHeight)
+            const next = target.scrollHeight
+            setHeight((prev) => (prev === next ? prev : next))
         }
 
         updateHeight()
@@ -50,31 +53,50 @@ export default function Main() {
 
     const touchStartX = useRef<number | null>(null)
 
-    const onTouchStart = (e: React.TouchEvent) => {
+    const onTouchStart = useCallback((e: React.TouchEvent) => {
         touchStartX.current = e.touches[0].clientX
-    }
+    }, [])
 
-    const onTouchEnd = (e: React.TouchEvent) => {
-        if (touchStartX.current === null) return
+    const onTouchEnd = useCallback(
+        (e: React.TouchEvent) => {
+            if (touchStartX.current === null) return
 
-        const diff = e.changedTouches[0].clientX - touchStartX.current
+            const diff = e.changedTouches[0].clientX - touchStartX.current
 
-        if (diff > 50 && tab === "status") {
-            setTab("mine")
-        }
+            if (diff > 50 && tab === "status") setTab("mine")
+            if (diff < -50 && tab === "mine") setTab("status")
 
-        if (diff < -50 && tab === "mine") {
-            setTab("status")
-        }
+            touchStartX.current = null
+        },
+        [tab],
+    )
 
-        touchStartX.current = null
-    }
+    const skeletons = useMemo(
+        () =>
+            Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+                <SkeletonMyDevice key={i} aria-hidden="true" data-nosnippet />
+            )),
+        [],
+    )
+
+    const alarmDevices = useMemo(
+        () =>
+            alarms.map((d) => (
+                <MyDevice
+                    key={`${d.type}-${d.id}`}
+                    id={d.id}
+                    type={d.type}
+                    state={socket.stateMap.get(d.id) ?? 2}
+                />
+            )),
+        [alarms, socket.version],
+    )
 
     return (
         <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <HeaderTabBar value={tab} onChange={setTab} />
 
-            <SlideContainer $height={height}>
+            <SlideContainer $height={height ?? undefined}>
                 <SlideTrack $tab={tab}>
                     <SlidePage ref={mineRef}>
                         <TextContainer>
@@ -101,14 +123,7 @@ export default function Main() {
                         </TextContainer>
 
                         <DeviceGrid>
-                            {renderState === "skeleton" &&
-                                Array.from({ length: 6 }).map((_, i) => (
-                                    <SkeletonMyDevice
-                                        key={i}
-                                        aria-hidden="true"
-                                        data-nosnippet
-                                    />
-                                ))}
+                            {renderState === "skeleton" && skeletons}
 
                             {renderState === "error" && (
                                 <NetworkFill>
@@ -116,15 +131,7 @@ export default function Main() {
                                 </NetworkFill>
                             )}
 
-                            {renderState === "content" &&
-                                alarms.map((d) => (
-                                    <MyDevice
-                                        key={`${d.type}-${d.id}`}
-                                        id={d.id}
-                                        type={d.type}
-                                        state={socket.stateMap.get(d.id) ?? 2}
-                                    />
-                                ))}
+                            {renderState === "content" && alarmDevices}
                         </DeviceGrid>
                     </SlidePage>
 
@@ -137,10 +144,15 @@ export default function Main() {
     )
 }
 
-const SlideContainer = styled.div<{ $height: number }>`
+const SlideContainer = styled.div<{ $height?: number }>`
     width: 100%;
     overflow: hidden;
-    height: ${({ $height }) => ($height === 0 ? "auto" : `${$height}px`)};
+
+    min-height: 100px;
+
+    height: ${({ $height }) =>
+        typeof $height === "number" ? `${$height}px` : "auto"};
+
     transition: height 0.2s ease;
 `
 
@@ -148,7 +160,6 @@ const SlideTrack = styled.div<{ $tab: "mine" | "status" }>`
     display: flex;
     width: 200%;
     align-items: flex-start;
-
     transform: translateX(${({ $tab }) => ($tab === "mine" ? "0%" : "-50%")});
     transition: transform 0.2s ease-out;
 `
