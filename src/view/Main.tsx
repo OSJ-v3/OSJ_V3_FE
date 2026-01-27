@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useLayoutEffect } from "react"
 import {
     HeaderTabBar,
     Text,
@@ -32,16 +32,46 @@ export function Main() {
         showSkeleton,
     })
 
-    useEffect(() => {
-        requestAnimationFrame(() => {
-            const target = tab === "mine" ? mineRef.current : statusRef.current
-            if (!target) return
+    useLayoutEffect(() => {
+        const target = tab === "mine" ? mineRef.current : statusRef.current
+        if (!target) return
+
+        const updateHeight = () => {
             setHeight(target.scrollHeight)
-        })
-    }, [tab, renderState])
+        }
+
+        updateHeight()
+
+        const observer = new ResizeObserver(updateHeight)
+        observer.observe(target)
+
+        return () => observer.disconnect()
+    }, [tab])
+
+    const touchStartX = useRef<number | null>(null)
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX
+    }
+
+    const onTouchEnd = (e: React.TouchEvent) => {
+        if (touchStartX.current === null) return
+
+        const diff = e.changedTouches[0].clientX - touchStartX.current
+
+        if (diff > 50 && tab === "status") {
+            setTab("mine")
+        }
+
+        if (diff < -50 && tab === "mine") {
+            setTab("status")
+        }
+
+        touchStartX.current = null
+    }
 
     return (
-        <Wrapper>
+        <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <HeaderTabBar value={tab} onChange={setTab} />
 
             <SlideContainer $height={height}>
