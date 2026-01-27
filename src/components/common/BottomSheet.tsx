@@ -5,6 +5,7 @@ import {
     useRef,
     useLayoutEffect,
     useEffect,
+    useCallback,
 } from "react"
 import { createPortal } from "react-dom"
 import styled from "styled-components"
@@ -27,16 +28,19 @@ export function BottomSheet({
 }: BottomSheetProps) {
     const [mounted, setMounted] = useState(false)
     const [closing, setClosing] = useState(false)
+
     const closedRef = useRef(false)
     const scrollYRef = useRef(0)
+    const sheetRef = useRef<HTMLDivElement>(null)
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         if (closing) return
         setClosing(true)
-    }
+    }, [closing])
 
     useLayoutEffect(() => {
         setMounted(true)
+        sheetRef.current?.focus()
     }, [])
 
     useEffect(() => {
@@ -45,7 +49,7 @@ export function BottomSheet({
         }
         window.addEventListener("keydown", onKeyDown)
         return () => window.removeEventListener("keydown", onKeyDown)
-    }, [])
+    }, [handleClose])
 
     useEffect(() => {
         const scrollY = window.scrollY
@@ -71,8 +75,14 @@ export function BottomSheet({
     if (!portalRoot) return null
 
     return createPortal(
-        <Overlay onClick={handleClose}>
+        <Overlay onClick={handleClose} aria-hidden={false}>
             <Sheet
+                ref={sheetRef}
+                tabIndex={-1}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="bottom-sheet-title"
+                aria-describedby={caption ? "bottom-sheet-caption" : undefined}
                 $mounted={mounted}
                 $closing={closing}
                 onClick={(e) => e.stopPropagation()}
@@ -83,16 +93,36 @@ export function BottomSheet({
                     }
                 }}
             >
-                <Handle onClick={handleClose}>
+                <Handle
+                    role="button"
+                    aria-label="닫기"
+                    tabIndex={0}
+                    onClick={handleClose}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault()
+                            handleClose()
+                        }
+                    }}
+                >
                     <ChevronDown size={24} />
                 </Handle>
 
                 <Header>
-                    <Text font="heading4" color="System.InverseSurface">
+                    <Text
+                        id="bottom-sheet-title"
+                        font="heading4"
+                        color="System.InverseSurface"
+                    >
                         {title}
                     </Text>
+
                     {caption && (
-                        <Text font="body2" color="Gray.SurfaceContainer">
+                        <Text
+                            id="bottom-sheet-caption"
+                            font="body2"
+                            color="Gray.SurfaceContainer"
+                        >
                             {caption}
                         </Text>
                     )}
@@ -103,7 +133,7 @@ export function BottomSheet({
                 {actions && <ActionArea>{actions}</ActionArea>}
             </Sheet>
         </Overlay>,
-        portalRoot
+        portalRoot,
     )
 }
 

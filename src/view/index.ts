@@ -1,5 +1,0 @@
-export * from "./Main"
-export * from "./Notice"
-export * from "./Setting"
-export * from "./Complain"
-export * from "./Detail"

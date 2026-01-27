@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react"
+import type { ElementType, ComponentPropsWithoutRef } from "react"
 import styled from "styled-components"
 import { type fontsKeyOfType, Fonts } from "../../styles"
 import type { Colors } from "../../types/theme"
@@ -16,37 +16,51 @@ export type ColorKey =
     | `Gray.${GrayKeys}`
     | `Sub.${SubKeys}`
 
-type Props = ComponentProps<"span"> & {
+type TextProps<T extends ElementType> = {
+    as?: T
     font?: fontsKeyOfType
     color?: ColorKey
-}
+    ariaLabel?: string
+    children?: React.ReactNode
+} & ComponentPropsWithoutRef<T>
 
 const fontToCss = (font: fontsKeyOfType) => {
     const style = Fonts[font]
     return `
         font-size: ${style.fontSize};
         font-weight: ${style.fontWeight};
+        line-height: ${style.lineHeight};
     `
 }
 
-const StyledText = styled.span<{
-    $font: fontsKeyOfType
-    $color: ColorKey
+const StyledText = styled.span.withConfig({
+    shouldForwardProp: (prop) => !["font", "color"].includes(prop),
+})<{
+    font: fontsKeyOfType
+    color: ColorKey
 }>`
     white-space: pre-line;
-    ${({ $font }) => fontToCss($font)};
-    color: ${({ theme, $color }) =>
-        resolveColor(theme.colors, $color) ?? theme.colors.System.OnSurface};
+    ${({ font }) => fontToCss(font)};
+    color: ${({ theme, color }) =>
+        resolveColor(theme.colors, color) ?? theme.colors.System.OnSurface};
 `
 
-export const Text = ({
+export const Text = <T extends ElementType = "span">({
+    as,
     font = "body1",
     color = "System.InverseSurface",
+    ariaLabel,
     children,
     ...props
-}: Props) => {
+}: TextProps<T>) => {
     return (
-        <StyledText $font={font} $color={color} {...props}>
+        <StyledText
+            as={as}
+            font={font}
+            color={color}
+            aria-label={ariaLabel}
+            {...props}
+        >
             {children}
         </StyledText>
     )

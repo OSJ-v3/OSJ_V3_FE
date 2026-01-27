@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import styled, { useTheme } from "styled-components"
 import { SettingIcon } from "../../../assets"
 import { LaundryTabSwitch, Notice } from ".."
+import { useCallback } from "react"
 
 type Option = "mine" | "status"
 
@@ -15,16 +16,29 @@ export function HeaderTabBar({
     const theme = useTheme()
     const navigate = useNavigate()
 
+    const goSetting = useCallback(() => {
+        navigate("/setting")
+    }, [navigate])
+
     return (
-        <HeaderWrapper>
+        <HeaderWrapper as="header" aria-label="상단 탭 및 설정 영역">
             <LaundryTabSwitch value={value} onChange={onChange} />
 
             <RightButtons>
                 <Notice />
-                <SettingIcon
-                    onClick={() => navigate("/setting")}
-                    color={theme.colors.Gray.OnSecondary}
-                />
+
+                <IconButton
+                    type="button"
+                    aria-label="설정 화면으로 이동"
+                    onClick={goSetting}
+                >
+                    <SettingIcon
+                        role="button"
+                        aria-label="설정"
+                        tabIndex={0}
+                        color={theme.colors.Gray.OnSecondary}
+                    />
+                </IconButton>
             </RightButtons>
         </HeaderWrapper>
     )
@@ -43,4 +57,24 @@ const RightButtons = styled.div`
     display: flex;
     align-items: center;
     gap: 24px;
+`
+
+const IconButton = styled.button`
+    all: unset;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    &:focus-visible {
+        outline: 2px solid ${({ theme }) => theme.colors.Main.Primary};
+        outline-offset: 2px;
+    }
+
+    &:active {
+        opacity: 0.7;
+    }
 `

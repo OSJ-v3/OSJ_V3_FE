@@ -1,5 +1,6 @@
 import styled, { css } from "styled-components"
 import { Text } from "../Text"
+import { useRef } from "react"
 
 type Option = "mine" | "status"
 
@@ -10,11 +11,36 @@ export function LaundryTabSwitch({
     value: Option
     onChange: (v: Option) => void
 }) {
+    const mineRef = useRef<HTMLButtonElement>(null)
+    const statusRef = useRef<HTMLButtonElement>(null)
+
+    const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === "ArrowRight") {
+            e.preventDefault()
+            onChange("status")
+            statusRef.current?.focus()
+        }
+
+        if (e.key === "ArrowLeft") {
+            e.preventDefault()
+            onChange("mine")
+            mineRef.current?.focus()
+        }
+    }
+
     return (
-        <Wrapper>
-            <Slider $position={value} />
+        <Wrapper
+            role="tablist"
+            aria-label="세탁실 탭 선택"
+            onKeyDown={onKeyDown}
+        >
+            <Slider $position={value} aria-hidden="true" />
 
             <TabButton
+                ref={mineRef}
+                role="tab"
+                aria-selected={value === "mine"}
+                tabIndex={value === "mine" ? 0 : -1}
                 $active={value === "mine"}
                 onClick={() => onChange("mine")}
             >
@@ -27,6 +53,10 @@ export function LaundryTabSwitch({
             </TabButton>
 
             <TabButton
+                ref={statusRef}
+                role="tab"
+                aria-selected={value === "status"}
+                tabIndex={value === "status" ? 0 : -1}
                 $active={value === "status"}
                 onClick={() => onChange("status")}
             >
@@ -54,7 +84,7 @@ const Wrapper = styled.div`
     justify-content: space-between;
 `
 
-const Slider = styled.div<{ $position: "mine" | "status" }>`
+const Slider = styled.div<{ $position: Option }>`
     position: absolute;
     top: 4px;
     bottom: 4px;
@@ -82,10 +112,13 @@ const TabButton = styled.button<{ $active: boolean }>`
     z-index: 10;
     cursor: pointer;
 
-    color: ${({ theme, $active }) =>
-        $active ? theme.colors.Main.Primary : theme.colors.Gray.Gray400};
-
     display: flex;
     align-items: center;
     justify-content: center;
+
+    &:focus-visible {
+        outline: 2px solid ${({ theme }) => theme.colors.Main.Primary};
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
 `

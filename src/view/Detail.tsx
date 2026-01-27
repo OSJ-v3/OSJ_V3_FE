@@ -7,7 +7,7 @@ import { useNoticeDetail } from "../apis/notice"
 import { useEffect } from "react"
 import { useNoticeReadStore } from "../stores/useNoticeReadStore"
 
-export function Detail() {
+export default function Detail() {
     const navigate = useNavigate()
     const { id } = useParams()
     const noticeId = Number(id)

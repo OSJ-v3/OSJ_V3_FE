@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useLayoutEffect } from "react"
 import {
     HeaderTabBar,
     Text,
@@ -7,12 +7,12 @@ import {
     NetworkError,
 } from "../components"
 import styled from "styled-components"
-import { Status } from "./Status"
+import Status from "./Status"
 import { useStartStore, useAlarmStore, useNetworkStore } from "../stores"
 import { useMinSkeleton, useNetworkRenderState } from "../hooks"
 import { useDeviceStatusSocket } from "../domains/devices"
 
-export function Main() {
+export default function Main() {
     const { start } = useStartStore()
     const { alarms } = useAlarmStore()
     const { status } = useNetworkStore()
@@ -32,27 +32,67 @@ export function Main() {
         showSkeleton,
     })
 
-    useEffect(() => {
-        requestAnimationFrame(() => {
-            const target = tab === "mine" ? mineRef.current : statusRef.current
-            if (!target) return
+    useLayoutEffect(() => {
+        const target = tab === "mine" ? mineRef.current : statusRef.current
+        if (!target) return
+
+        const updateHeight = () => {
             setHeight(target.scrollHeight)
-        })
-    }, [tab, renderState])
+        }
+
+        updateHeight()
+
+        const observer = new ResizeObserver(updateHeight)
+        observer.observe(target)
+
+        return () => observer.disconnect()
+    }, [tab])
+
+    const touchStartX = useRef<number | null>(null)
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX
+    }
+
+    const onTouchEnd = (e: React.TouchEvent) => {
+        if (touchStartX.current === null) return
+
+        const diff = e.changedTouches[0].clientX - touchStartX.current
+
+        if (diff > 50 && tab === "status") {
+            setTab("mine")
+        }
+
+        if (diff < -50 && tab === "mine") {
+            setTab("status")
+        }
+
+        touchStartX.current = null
+    }
 
     return (
-        <Wrapper>
+        <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <HeaderTabBar value={tab} onChange={setTab} />
 
             <SlideContainer $height={height}>
                 <SlideTrack $tab={tab}>
                     <SlidePage ref={mineRef}>
                         <TextContainer>
-                            <Text font="heading2">
+                            <Text
+                                as="h1"
+                                font="heading2"
+                                role="heading"
+                                aria-level={1}
+                                style={{
+                                    fontSize: "24px",
+                                    fontWeight: 700,
+                                }}
+                            >
                                 알림 설정한
                                 <br />
                                 세탁기와 건조기
                             </Text>
+
                             <Text font="body1" color="Gray.OnSecondary">
                                 알림을 설정하여 세탁기와 건조기를
                                 <br />
@@ -63,7 +103,11 @@ export function Main() {
                         <DeviceGrid>
                             {renderState === "skeleton" &&
                                 Array.from({ length: 6 }).map((_, i) => (
-                                    <SkeletonMyDevice key={i} />
+                                    <SkeletonMyDevice
+                                        key={i}
+                                        aria-hidden="true"
+                                        data-nosnippet
+                                    />
                                 ))}
 
                             {renderState === "error" && (
