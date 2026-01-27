@@ -30,51 +30,31 @@ export function useDeviceStatusSocket() {
         ws.onopen = () => setStatus("connected")
 
         ws.onmessage = (e) => {
-            try {
-                const data = JSON.parse(e.data)
-                let changed = false
+            const data = JSON.parse(e.data)
+            let changed = false
+            const map = stateMapRef.current
 
-                const map = stateMapRef.current
-
-                if (Array.isArray(data)) {
-                    for (const d of data) {
-                        if (
-                            typeof d?.id === "number" &&
-                            isDeviceState(d.state)
-                        ) {
-                            if (map.get(d.id) !== d.state) {
-                                map.set(d.id, d.state)
-                                changed = true
-                            }
-                        }
-                    }
-                } else if (
-                    typeof data?.id === "number" &&
-                    isDeviceState(data.state)
-                ) {
-                    if (map.get(data.id) !== data.state) {
-                        map.set(data.id, data.state)
+            const apply = (d: any) => {
+                if (typeof d?.id === "number" && isDeviceState(d.state)) {
+                    if (map.get(d.id) !== d.state) {
+                        map.set(d.id, d.state)
                         changed = true
                     }
                 }
-
-                if (changed) {
-                    setVersion((v) => v + 1)
-                }
-            } catch {
-                // 무시
             }
+
+            Array.isArray(data) ? data.forEach(apply) : apply(data)
+
+            if (changed) setVersion((v) => v + 1)
         }
 
         ws.onerror = ws.onclose = () => setStatus("error")
-
         return () => ws.close()
     }, [networkStatus])
 
     return {
         stateMap: stateMapRef.current,
         version,
-        ready: status === "connected",
         loading: status === "connecting",
         error: status === "error",
     }
