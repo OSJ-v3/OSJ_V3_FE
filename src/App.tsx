@@ -1,19 +1,18 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { ThemeProvider } from "styled-components"
-import { lazy, Suspense } from "react"
+import { lazy, Suspense, useEffect, useState } from "react"
 
 import { Splash } from "./components"
 import { ToastProvider } from "./contexts/ToastContext"
 
 import { useSystemTheme, useThemeColor } from "./hooks"
-
 import {
     useInitNoticePush,
     useSyncAlarmFromServer,
     useNetworkListener,
 } from "./hooks"
 
-import { useThemeStore, useStartStore } from "./stores"
+import { useThemeStore } from "./stores"
 import { darkTheme, lightTheme, GlobalStyle, AppLayout } from "./styles"
 
 const Main = lazy(() => import("./view/Main"))
@@ -56,27 +55,39 @@ function App() {
     )
 }
 
-function AppInner() {
-    const isLoading = useStartStore((s) => s.isLoading)
-
+function DeferredEffects() {
     useInitNoticePush()
     useSyncAlarmFromServer()
     useNetworkListener()
+    return null
+}
 
-    if (isLoading) {
-        return <Splash />
-    }
+function AppInner() {
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     return (
         <>
-            <GlobalStyle />
-            <AlarmRenderer />
-            <ToastRenderer />
+            <Suspense fallback={null}>
+                <AlarmRenderer />
+                <ToastRenderer />
+            </Suspense>
 
             <AppLayout>
-                <Suspense fallback={null}>
+                <Suspense fallback={<Splash />}>
                     <Routes>
-                        <Route path="/" element={<Main />} />
+                        <Route
+                            path="/"
+                            element={
+                                <>
+                                    <Main />
+                                    {mounted && <DeferredEffects />}
+                                </>
+                            }
+                        />
                         <Route path="/notice" element={<Notice />} />
                         <Route path="/setting" element={<Setting />} />
                         <Route path="/complain" element={<Complain />} />
