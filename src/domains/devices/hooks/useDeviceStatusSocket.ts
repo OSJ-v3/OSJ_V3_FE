@@ -73,7 +73,7 @@ export function useDeviceStatusSocket() {
 
     return {
         stateMap: stateMapRef.current,
-        version, // 🔥 의존성용
+        version,
         ready: status === "connected",
         loading: status === "connecting",
         error: status === "error",
