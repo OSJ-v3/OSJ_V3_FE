@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, useMemo } from "react"
+import { useLayoutEffect, useRef, useState } from "react"
 import {
     HeaderTabBar,
     Text,
@@ -21,7 +21,7 @@ export function Main() {
     const statusRef = useRef<HTMLDivElement>(null)
     const [height, setHeight] = useState<number>(0)
 
-    const { stateMap, version, loading, error } = useDeviceStatusSocket()
+    const { stateMap, loading, error } = useDeviceStatusSocket()
 
     const showSkeleton = useMinSkeleton(loading, 500)
 
@@ -69,15 +69,6 @@ export function Main() {
         touchStartX.current = null
     }
 
-    const statusStates = useMemo(
-        () =>
-            Array.from(stateMap.entries()).map(([id, state]) => ({
-                id,
-                state,
-            })),
-        [stateMap, version],
-    )
-
     return (
         <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <HeaderTabBar value={tab} onChange={setTab} />
@@ -123,11 +114,7 @@ export function Main() {
                     </SlidePage>
 
                     <SlidePage ref={statusRef}>
-                        <Status
-                            states={statusStates}
-                            loading={loading}
-                            error={error}
-                        />
+                        <Status loading={loading} error={error} />
                     </SlidePage>
                 </SlideTrack>
             </SlideContainer>
@@ -138,7 +125,7 @@ export function Main() {
 const SlideContainer = styled.div<{ $height: number }>`
     width: 100%;
     overflow: hidden;
-    height: ${({ $height }) => `${$height}px`};
+    height: ${({ $height }) => ($height === 0 ? "100vh" : `${$height}px`)};
     transition: height 0.2s ease;
 `
 

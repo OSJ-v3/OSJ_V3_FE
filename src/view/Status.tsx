@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import styled from "styled-components"
 import {
     NetworkError,
@@ -13,11 +13,9 @@ import {
 } from "../hooks"
 import { maleSchoolLayout, maleDormLayout, femaleLayout } from "../layouts"
 import { useAreaStore, useNetworkStore } from "../stores"
-import type { DeviceState } from "../domains/devices"
-import type { DeviceData } from "../components"
+import { useDeviceStatusSocket } from "../domains/devices"
 
 interface Props {
-    states: DeviceState[]
     loading: boolean
     error: boolean
 }
@@ -25,50 +23,41 @@ interface Props {
 const AREA_CONFIG = {
     "남자 학교측": {
         layout: maleSchoolLayout,
-        range: [1, 25] as const,
+        range: [1, 25] as readonly [number, number],
     },
     "남자 기숙사측": {
         layout: maleDormLayout,
-        range: [26, 51] as const,
+        range: [26, 51] as readonly [number, number],
     },
     여자: {
         layout: femaleLayout,
-        range: [52, 67] as const,
+        range: [52, 67] as readonly [number, number],
     },
 }
 
-export function Status({ states, loading }: Props) {
+export function Status({ loading }: Props) {
     const { area } = useAreaStore()
     const { status } = useNetworkStore()
     const [present, setPresent] = useState(area)
 
-    const showSkeleton = useMinSkeleton(loading, 500)
+    const {
+        stateMap,
+        version,
+        loading: socketLoading,
+        error: socketError,
+    } = useDeviceStatusSocket()
+
+    const showSkeleton = useMinSkeleton(loading || socketLoading, 500)
 
     const renderState = useNetworkRenderState({
         status,
-        loading,
+        loading: loading || socketLoading,
         showSkeleton,
     })
 
     const isSkeleton = renderState === "skeleton"
 
     const { layout, range } = AREA_CONFIG[present]
-
-    const stateMap = useMemo(() => {
-        const map = new Map<number, DeviceData["state"]>()
-        for (const s of states) {
-            map.set(s.id, s.state)
-        }
-        return map
-    }, [states])
-
-    const version = useMemo(() => {
-        let v = 0
-        for (const s of states) {
-            v = (v * 31 + s.id * 7 + s.state) | 0
-        }
-        return v
-    }, [states])
 
     const devices = useDevicesSocket(
         layout,
@@ -78,7 +67,7 @@ export function Status({ states, loading }: Props) {
         isSkeleton,
     )
 
-    if (renderState === "error") {
+    if (renderState === "error" || socketError) {
         return (
             <ErrorFill>
                 <NetworkError />
