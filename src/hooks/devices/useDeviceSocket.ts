@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import type { LayoutCell, DeviceData } from "../../components"
 import type { DeviceState } from "../../domains/devices"
 
@@ -7,56 +8,50 @@ export function useDevicesSocket(
     range: [number, number],
     forceSkeleton?: boolean,
 ): DeviceData[] {
-    if (forceSkeleton) {
-        return layout
-            .flat()
-            .filter((c) => c.type !== "empty")
-            .flatMap((cell) => {
-                if (cell.type === "single") {
-                    return [
-                        {
-                            id: cell.device.id,
-                            type: cell.device.deviceType,
-                            state: "skeleton",
-                        },
-                    ]
-                }
+    return useMemo(() => {
+        const cells = layout.flat().filter((c) => c.type !== "empty")
 
-                return cell.devices.map((d) => ({
-                    id: d.id,
-                    type: d.deviceType,
-                    state: "skeleton",
-                }))
-            })
-    }
+        if (forceSkeleton) {
+            return cells.flatMap((cell) =>
+                cell.type === "single"
+                    ? [
+                          {
+                              id: cell.device.id,
+                              type: cell.device.deviceType,
+                              state: "skeleton",
+                          },
+                      ]
+                    : cell.devices.map((d) => ({
+                          id: d.id,
+                          type: d.deviceType,
+                          state: "skeleton",
+                      })),
+            )
+        }
 
-    const stateMap = new Map(states.map((s) => [s.id, s.state]))
+        const stateMap = new Map(states.map((s) => [s.id, s.state]))
+        const [min, max] = range
 
-    return layout
-        .flat()
-        .filter((c) => c.type !== "empty")
-        .flatMap((cell) => {
-            if (cell.type === "single") {
-                const id = cell.device.id
-                return [
-                    {
-                        id,
-                        type: cell.device.deviceType,
-                        state:
-                            id >= range[0] && id <= range[1]
-                                ? (stateMap.get(id) ?? 2)
-                                : 2,
-                    },
-                ]
-            }
-
-            return cell.devices.map((d) => ({
-                id: d.id,
-                type: d.deviceType,
-                state:
-                    d.id >= range[0] && d.id <= range[1]
-                        ? (stateMap.get(d.id) ?? 2)
-                        : 2,
-            }))
-        })
+        return cells.flatMap((cell) =>
+            cell.type === "single"
+                ? [
+                      {
+                          id: cell.device.id,
+                          type: cell.device.deviceType,
+                          state:
+                              cell.device.id >= min && cell.device.id <= max
+                                  ? (stateMap.get(cell.device.id) ?? 2)
+                                  : 2,
+                      },
+                  ]
+                : cell.devices.map((d) => ({
+                      id: d.id,
+                      type: d.deviceType,
+                      state:
+                          d.id >= min && d.id <= max
+                              ? (stateMap.get(d.id) ?? 2)
+                              : 2,
+                  })),
+        )
+    }, [layout, states, range, forceSkeleton])
 }
