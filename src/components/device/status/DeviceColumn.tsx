@@ -1,4 +1,5 @@
 import styled from "styled-components"
+import { memo } from "react"
 import { type LayoutCell, type DeviceData, DeviceItem } from ".."
 
 interface Props {
@@ -6,18 +7,19 @@ interface Props {
     devices: Record<number, DeviceData>
 }
 
-export function DeviceColumn({ cells, devices }: Props) {
+export const DeviceColumn = memo(function DeviceColumn({
+    cells,
+    devices,
+}: Props) {
     return (
         <Col>
             {cells.map((cell, idx) => {
-                if (cell.type === "empty") {
-                    return <EmptySlot key={idx} />
-                }
+                if (cell.type === "empty") return <Empty key={idx} />
 
                 if (cell.type === "single") {
                     return (
                         <DeviceItem
-                            key={idx}
+                            key={cell.device.id}
                             device={devices[cell.device.id]}
                         />
                     )
@@ -32,7 +34,7 @@ export function DeviceColumn({ cells, devices }: Props) {
             })}
         </Col>
     )
-}
+})
 
 const Col = styled.div`
     flex: 1;
@@ -46,7 +48,6 @@ const PairBox = styled.div`
     gap: 12px;
 `
 
-const EmptySlot = styled.div`
-    width: 100%;
+const Empty = styled.div`
     height: 88px;
 `
