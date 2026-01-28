@@ -21,11 +21,10 @@ export default function Main() {
     const networkStatus = useNetworkStore((s) => s.status)
 
     const [tab, setTab] = useState<"mine" | "status">(start)
+    const [height, setHeight] = useState<number | undefined>(undefined)
 
     const mineRef = useRef<HTMLDivElement>(null)
     const statusRef = useRef<HTMLDivElement>(null)
-    const heightRef = useRef<number | null>(null)
-    const [, forceRender] = useState(0)
 
     const socket = useDeviceStatusSocket()
     const showSkeleton = useMinSkeleton(socket.loading, 500)
@@ -41,11 +40,7 @@ export default function Main() {
         if (!target) return
 
         const updateHeight = () => {
-            const next = target.scrollHeight
-            if (heightRef.current !== next) {
-                heightRef.current = next
-                forceRender((v) => v + 1)
-            }
+            setHeight(target.scrollHeight)
         }
 
         updateHeight()
@@ -64,14 +59,14 @@ export default function Main() {
 
     const onTouchEnd = useCallback(
         (e: React.TouchEvent) => {
-            const startX = touchStartX.current
-            if (startX === null) return
+            if (touchStartX.current === null) return
 
-            const diff = e.changedTouches[0].clientX - startX
+            const diff = e.changedTouches[0].clientX - touchStartX.current
 
             if (diff > SWIPE_THRESHOLD && tab === "status") {
                 setTab("mine")
-            } else if (diff < -SWIPE_THRESHOLD && tab === "mine") {
+            }
+            if (diff < -SWIPE_THRESHOLD && tab === "mine") {
                 setTab("status")
             }
 
@@ -105,22 +100,15 @@ export default function Main() {
         <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <HeaderTabBar value={tab} onChange={setTab} />
 
-            <SlideContainer
-                $height={
-                    typeof heightRef.current === "number"
-                        ? heightRef.current
-                        : undefined
-                }
-            >
+            <SlideContainer $height={height}>
                 <SlideTrack $tab={tab}>
                     <SlidePage ref={mineRef}>
                         <TextContainer>
                             <Text
                                 as="h1"
                                 font="heading2"
-                                role="heading"
                                 aria-level={1}
-                                style={{ fontSize: 24, fontWeight: 700 }}
+                                role="heading"
                             >
                                 알림 설정한
                                 <br />
@@ -180,9 +168,10 @@ const SlideTrack = styled.div<{ $tab: "mine" | "status" }>`
     align-items: flex-start;
     transform: translateX(${({ $tab }) => ($tab === "mine" ? "0%" : "-50%")});
     transition: transform 0.2s ease-out;
+    will-change: transform;
 `
 
-const SlidePage = styled.div`
+const SlidePage = styled.section`
     width: 50%;
     flex-shrink: 0;
     display: flex;
