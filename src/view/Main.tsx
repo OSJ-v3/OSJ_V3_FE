@@ -1,4 +1,4 @@
-import { useRef, useState, useLayoutEffect, useCallback, useMemo } from "react"
+import { useRef, useState, useLayoutEffect, useMemo, useEffect } from "react"
 import styled from "styled-components"
 import {
     HeaderTabBar,
@@ -21,10 +21,11 @@ export default function Main() {
     const networkStatus = useNetworkStore((s) => s.status)
 
     const [tab, setTab] = useState<"mine" | "status">(start)
-    const [height, setHeight] = useState<number | undefined>(undefined)
+    const [height, setHeight] = useState<number>()
 
     const mineRef = useRef<HTMLDivElement>(null)
     const statusRef = useRef<HTMLDivElement>(null)
+    const touchStartX = useRef<number | null>(null)
 
     const socket = useDeviceStatusSocket()
     const showSkeleton = useMinSkeleton(socket.loading, 500)
@@ -40,7 +41,8 @@ export default function Main() {
         if (!target) return
 
         const updateHeight = () => {
-            setHeight(target.scrollHeight)
+            const next = target.scrollHeight
+            setHeight((prev) => (prev !== next ? next : prev))
         }
 
         updateHeight()
@@ -51,29 +53,35 @@ export default function Main() {
         return () => observer.disconnect()
     }, [tab])
 
-    const touchStartX = useRef<number | null>(null)
+    useEffect(() => {
+        const el = document.body
 
-    const onTouchStart = useCallback((e: React.TouchEvent) => {
-        touchStartX.current = e.touches[0].clientX
-    }, [])
+        const onStart = (e: TouchEvent) => {
+            touchStartX.current = e.touches[0].clientX
+        }
 
-    const onTouchEnd = useCallback(
-        (e: React.TouchEvent) => {
+        const onEnd = (e: TouchEvent) => {
             if (touchStartX.current === null) return
 
             const diff = e.changedTouches[0].clientX - touchStartX.current
 
             if (diff > SWIPE_THRESHOLD && tab === "status") {
                 setTab("mine")
-            }
-            if (diff < -SWIPE_THRESHOLD && tab === "mine") {
+            } else if (diff < -SWIPE_THRESHOLD && tab === "mine") {
                 setTab("status")
             }
 
             touchStartX.current = null
-        },
-        [tab],
-    )
+        }
+
+        el.addEventListener("touchstart", onStart, { passive: true })
+        el.addEventListener("touchend", onEnd, { passive: true })
+
+        return () => {
+            el.removeEventListener("touchstart", onStart)
+            el.removeEventListener("touchend", onEnd)
+        }
+    }, [tab])
 
     const skeletons = useMemo(
         () =>
@@ -97,19 +105,14 @@ export default function Main() {
     )
 
     return (
-        <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <Wrapper>
             <HeaderTabBar value={tab} onChange={setTab} />
 
             <SlideContainer $height={height}>
                 <SlideTrack $tab={tab}>
                     <SlidePage ref={mineRef}>
                         <TextContainer>
-                            <Text
-                                as="h1"
-                                font="heading2"
-                                aria-level={1}
-                                role="heading"
-                            >
+                            <Text as="h1" font="heading2">
                                 알림 설정한
                                 <br />
                                 세탁기와 건조기
@@ -171,7 +174,7 @@ const SlideTrack = styled.div<{ $tab: "mine" | "status" }>`
     will-change: transform;
 `
 
-const SlidePage = styled.section`
+const SlidePage = styled.div`
     width: 50%;
     flex-shrink: 0;
     display: flex;
