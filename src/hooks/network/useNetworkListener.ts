@@ -1,31 +1,33 @@
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useNetworkStore } from "../../stores"
 
 const SOCKET_URL = import.meta.env.VITE_WS_BASE_URL
 const TIMEOUT = 3000
+const INTERVAL = 5000
 
 export function useNetworkListener() {
-    const status = useNetworkStore((s) => s.status)
     const setStatus = useNetworkStore((s) => s.setStatus)
+    const getStatus = useNetworkStore.getState
+
+    const wsRef = useRef<WebSocket | null>(null)
 
     useEffect(() => {
         let mounted = true
-        let ws: WebSocket | null = null
+        let intervalId: number
 
-        if (status === "connecting") {
-            // 이미 초기 상태면 굳이 다시 안 바꿈. 비워둔 코드
-        } else if (!status) {
-            setStatus("connecting")
-        }
+        const connect = () => {
+            if (!mounted) return
 
-        const update = () => {
-            ws = new WebSocket(SOCKET_URL)
+            wsRef.current?.close()
+
+            const ws = new WebSocket(SOCKET_URL)
+            wsRef.current = ws
 
             const timer = setTimeout(() => {
                 if (!mounted) return
-                ws?.close()
+                ws.close()
 
-                if (status === "connecting") {
+                if (getStatus().status === "connecting") {
                     setStatus("offline")
                 }
             }, TIMEOUT)
@@ -43,13 +45,17 @@ export function useNetworkListener() {
             }
         }
 
-        update()
-        const interval = setInterval(update, 5000)
+        const id = requestIdleCallback(() => {
+            setStatus("connecting")
+            connect()
+            intervalId = window.setInterval(connect, INTERVAL)
+        })
 
         return () => {
             mounted = false
-            ws?.close()
-            clearInterval(interval)
+            cancelIdleCallback(id)
+            wsRef.current?.close()
+            clearInterval(intervalId)
         }
-    }, [setStatus, status])
+    }, [setStatus])
 }
