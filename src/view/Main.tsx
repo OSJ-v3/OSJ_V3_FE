@@ -47,6 +47,7 @@ export default function Main() {
 
         const observer = new ResizeObserver(updateHeight)
         observer.observe(target)
+
         return () => observer.disconnect()
     }, [tab])
 
@@ -59,6 +60,7 @@ export default function Main() {
     const onTouchEnd = useCallback(
         (e: React.TouchEvent) => {
             if (touchStartX.current === null) return
+
             const diff = e.changedTouches[0].clientX - touchStartX.current
 
             if (diff > 50 && tab === "status") setTab("mine")
@@ -72,7 +74,7 @@ export default function Main() {
     const skeletons = useMemo(
         () =>
             Array.from({ length: SKELETON_COUNT }).map((_, i) => (
-                <SkeletonMyDevice key={i} aria-hidden="true" />
+                <SkeletonMyDevice key={i} aria-hidden="true" data-nosnippet />
             )),
         [],
     )
@@ -103,12 +105,16 @@ export default function Main() {
                                 font="heading2"
                                 role="heading"
                                 aria-level={1}
-                                style={{ fontSize: 24, fontWeight: 700 }}
+                                style={{
+                                    fontSize: "24px",
+                                    fontWeight: 700,
+                                }}
                             >
                                 알림 설정한
                                 <br />
                                 세탁기와 건조기
                             </Text>
+
                             <Text font="body1" color="Gray.OnSecondary">
                                 알림을 설정하여 세탁기와 건조기를
                                 <br />
@@ -150,15 +156,19 @@ const Wrapper = styled.div`
 const SlideContainer = styled.div<{ $height?: number }>`
     width: 100%;
     overflow: hidden;
+
     min-height: 100px;
+
     height: ${({ $height }) =>
         typeof $height === "number" ? `${$height}px` : "auto"};
+
     transition: height 0.2s ease;
 `
 
 const SlideTrack = styled.div<{ $tab: "mine" | "status" }>`
     display: flex;
     width: 200%;
+    align-items: flex-start;
     transform: translateX(${({ $tab }) => ($tab === "mine" ? "0%" : "-50%")});
     transition: transform 0.2s ease-out;
 `
