@@ -4,6 +4,7 @@ import { lazy, Suspense, useEffect, useState } from "react"
 
 import { Splash } from "./components"
 import { ToastProvider } from "./contexts/ToastContext"
+import Main from "./view/Main"
 
 import { useSystemTheme, useThemeColor } from "./hooks"
 import {
@@ -15,7 +16,6 @@ import {
 import { useThemeStore } from "./stores"
 import { darkTheme, lightTheme, GlobalStyle, AppLayout } from "./styles"
 
-const Main = lazy(() => import("./view/Main"))
 const Notice = lazy(() => import("./view/Notice"))
 const Setting = lazy(() => import("./view/Setting"))
 const Complain = lazy(() => import("./view/Complain"))
@@ -47,16 +47,9 @@ function DeferredUI() {
 }
 
 function DeferredEffects() {
-    useEffect(() => {
-        const id = requestIdleCallback(() => {
-            useInitNoticePush()
-            useSyncAlarmFromServer()
-            useNetworkListener()
-        })
-
-        return () => cancelIdleCallback(id)
-    }, [])
-
+    useInitNoticePush()
+    useSyncAlarmFromServer()
+    useNetworkListener()
     return null
 }
 
