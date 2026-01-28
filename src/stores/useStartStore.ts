@@ -6,8 +6,10 @@ export type PageType = "mine" | "status"
 interface StartPageState {
     start: PageType
     isLoading: boolean
+    hydrated: boolean
     setStart: (page: PageType) => void
     setLoading: (loading: boolean) => void
+    setHydrated: () => void
 }
 
 export const useStartStore = create<StartPageState>()(
@@ -19,13 +21,14 @@ export const useStartStore = create<StartPageState>()(
 
             setStart: (page) => set({ start: page }),
             setLoading: (loading) => set({ isLoading: loading }),
+            setHydrated: () => set({ hydrated: true, isLoading: false }),
         }),
         {
-            name: "area-storage",
+            name: "start-storage",
             partialize: (state) => ({ start: state.start }),
 
             onRehydrateStorage: () => (state) => {
-                state?.setLoading(false)
+                state?.setHydrated()
             },
         },
     ),
