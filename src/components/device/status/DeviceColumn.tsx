@@ -10,7 +10,9 @@ export function DeviceColumn({ cells, devices }: Props) {
     return (
         <Col>
             {cells.map((cell, idx) => {
-                if (cell.type === "empty") return <Empty key={idx} />
+                if (cell.type === "empty") {
+                    return <EmptySlot key={idx} />
+                }
 
                 if (cell.type === "single") {
                     return (
@@ -24,7 +26,6 @@ export function DeviceColumn({ cells, devices }: Props) {
                 return (
                     <PairBox key={idx}>
                         <DeviceItem device={devices[cell.devices[0].id]} />
-
                         <DeviceItem device={devices[cell.devices[1].id]} />
                     </PairBox>
                 )
@@ -45,6 +46,7 @@ const PairBox = styled.div`
     gap: 12px;
 `
 
-const Empty = styled.div`
-    height: auto;
+const EmptySlot = styled.div`
+    width: 100%;
+    height: 88px;
 `
