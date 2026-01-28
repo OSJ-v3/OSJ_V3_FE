@@ -17,6 +17,11 @@ export const useAreaStore = create<AreaState>()(
         {
             name: "area-storage",
             version: 1,
+            migrate: (persistedState: any) => {
+                return {
+                    area: persistedState?.area ?? "남자 학교측",
+                }
+            },
         },
     ),
 )
