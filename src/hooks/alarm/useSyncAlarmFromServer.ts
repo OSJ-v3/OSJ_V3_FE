@@ -16,19 +16,22 @@ function mapToAlarmDevices(ids: number[]): AlarmDevice[] {
 }
 
 export function useSyncAlarmFromServer() {
-    const { token } = useFcmStore()
+    const token = useFcmStore((s) => s.token)
     const setAlarms = useAlarmStore((s) => s.setAlarms)
 
     useEffect(() => {
         if (!token) return
 
-        fetchPushAlertList(token)
-            .then((ids) => {
-                const devices = mapToAlarmDevices(ids)
-                setAlarms(devices)
-            })
-            .catch((err) => {
-                console.error("알림 목록 동기화 실패", err)
-            })
+        const id = requestIdleCallback(() => {
+            fetchPushAlertList(token)
+                .then((ids) => {
+                    setAlarms(mapToAlarmDevices(ids))
+                })
+                .catch((err) => {
+                    console.error("알림 목록 동기화 실패", err)
+                })
+        })
+
+        return () => cancelIdleCallback(id)
     }, [token, setAlarms])
 }

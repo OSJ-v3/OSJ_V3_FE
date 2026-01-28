@@ -13,11 +13,9 @@ export function useNetworkRenderState({
     showSkeleton,
 }: Params) {
     return useMemo<"skeleton" | "error" | "content">(() => {
-        if (status === "offline") return "error"
+        if (loading && showSkeleton) return "skeleton"
 
-        if (status === "connecting" && loading) {
-            return showSkeleton ? "skeleton" : "content"
-        }
+        if (status === "offline") return "error"
 
         return "content"
     }, [status, loading, showSkeleton])
