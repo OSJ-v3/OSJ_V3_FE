@@ -1,4 +1,4 @@
-import { useRef, useState, useLayoutEffect, useMemo, useEffect } from "react"
+import { useRef, useState, useLayoutEffect, useCallback, useMemo } from "react"
 import styled from "styled-components"
 import {
     HeaderTabBar,
@@ -21,11 +21,11 @@ export default function Main() {
     const networkStatus = useNetworkStore((s) => s.status)
 
     const [tab, setTab] = useState<"mine" | "status">(start)
-    const [height, setHeight] = useState<number>()
 
     const mineRef = useRef<HTMLDivElement>(null)
     const statusRef = useRef<HTMLDivElement>(null)
-    const touchStartX = useRef<number | null>(null)
+    const heightRef = useRef<number | null>(null)
+    const [, forceRender] = useState(0)
 
     const socket = useDeviceStatusSocket()
     const showSkeleton = useMinSkeleton(socket.loading, 500)
@@ -42,7 +42,10 @@ export default function Main() {
 
         const updateHeight = () => {
             const next = target.scrollHeight
-            setHeight((prev) => (prev !== next ? next : prev))
+            if (heightRef.current !== next) {
+                heightRef.current = next
+                forceRender((v) => v + 1)
+            }
         }
 
         updateHeight()
@@ -53,17 +56,18 @@ export default function Main() {
         return () => observer.disconnect()
     }, [tab])
 
-    useEffect(() => {
-        const el = document.body
+    const touchStartX = useRef<number | null>(null)
 
-        const onStart = (e: TouchEvent) => {
-            touchStartX.current = e.touches[0].clientX
-        }
+    const onTouchStart = useCallback((e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX
+    }, [])
 
-        const onEnd = (e: TouchEvent) => {
-            if (touchStartX.current === null) return
+    const onTouchEnd = useCallback(
+        (e: React.TouchEvent) => {
+            const startX = touchStartX.current
+            if (startX === null) return
 
-            const diff = e.changedTouches[0].clientX - touchStartX.current
+            const diff = e.changedTouches[0].clientX - startX
 
             if (diff > SWIPE_THRESHOLD && tab === "status") {
                 setTab("mine")
@@ -72,16 +76,9 @@ export default function Main() {
             }
 
             touchStartX.current = null
-        }
-
-        el.addEventListener("touchstart", onStart, { passive: true })
-        el.addEventListener("touchend", onEnd, { passive: true })
-
-        return () => {
-            el.removeEventListener("touchstart", onStart)
-            el.removeEventListener("touchend", onEnd)
-        }
-    }, [tab])
+        },
+        [tab],
+    )
 
     const skeletons = useMemo(
         () =>
@@ -105,14 +102,26 @@ export default function Main() {
     )
 
     return (
-        <Wrapper>
+        <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <HeaderTabBar value={tab} onChange={setTab} />
 
-            <SlideContainer $height={height}>
+            <SlideContainer
+                $height={
+                    typeof heightRef.current === "number"
+                        ? heightRef.current
+                        : undefined
+                }
+            >
                 <SlideTrack $tab={tab}>
                     <SlidePage ref={mineRef}>
                         <TextContainer>
-                            <Text as="h1" font="heading2">
+                            <Text
+                                as="h1"
+                                font="heading2"
+                                role="heading"
+                                aria-level={1}
+                                style={{ fontSize: 24, fontWeight: 700 }}
+                            >
                                 알림 설정한
                                 <br />
                                 세탁기와 건조기
@@ -171,7 +180,6 @@ const SlideTrack = styled.div<{ $tab: "mine" | "status" }>`
     align-items: flex-start;
     transform: translateX(${({ $tab }) => ($tab === "mine" ? "0%" : "-50%")});
     transition: transform 0.2s ease-out;
-    will-change: transform;
 `
 
 const SlidePage = styled.div`
