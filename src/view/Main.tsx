@@ -83,7 +83,7 @@ export default function Main() {
     const skeletons = useMemo(
         () =>
             Array.from({ length: SKELETON_COUNT }).map((_, i) => (
-                <SkeletonMyDevice key={i} aria-hidden data-nosnippet />
+                <SkeletonMyDevice key={i} aria-hidden />
             )),
         [],
     )

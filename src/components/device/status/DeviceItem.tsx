@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import {
     DeviceIcon,
     type DeviceData,
@@ -17,7 +17,11 @@ function isRealDevice(device: DeviceData): device is RealDeviceData {
 export function DeviceItem({ device }: Props) {
     const [selected, setSelected] = useState<RealDeviceData | null>(null)
 
-    if (!device) return <div style={{ flex: 1 }} />
+    const open = useCallback((d: RealDeviceData) => setSelected(d), [])
+
+    const close = useCallback(() => setSelected(null), [])
+
+    if (!device) return <div style={{ flex: 1, height: 88 }} />
 
     if (!isRealDevice(device)) {
         return (
@@ -37,15 +41,10 @@ export function DeviceItem({ device }: Props) {
                 type={device.type}
                 state={device.state}
                 size="large"
-                onClick={() => setSelected(device)}
+                onClick={() => open(device)}
             />
 
-            {selected && (
-                <DeviceAlarmSheet
-                    device={selected}
-                    onClose={() => setSelected(null)}
-                />
-            )}
+            {selected && <DeviceAlarmSheet device={selected} onClose={close} />}
         </>
     )
 }

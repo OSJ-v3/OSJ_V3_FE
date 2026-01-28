@@ -1,4 +1,5 @@
 import styled from "styled-components"
+import { memo } from "react"
 import { type LayoutCell, type DeviceData, DeviceItem } from ".."
 
 interface Props {
@@ -6,7 +7,10 @@ interface Props {
     devices: Record<number, DeviceData>
 }
 
-export function DeviceColumn({ cells, devices }: Props) {
+export const DeviceColumn = memo(function DeviceColumn({
+    cells,
+    devices,
+}: Props) {
     return (
         <Col>
             {cells.map((cell, idx) => {
@@ -15,7 +19,7 @@ export function DeviceColumn({ cells, devices }: Props) {
                 if (cell.type === "single") {
                     return (
                         <DeviceItem
-                            key={idx}
+                            key={cell.device.id}
                             device={devices[cell.device.id]}
                         />
                     )
@@ -24,14 +28,13 @@ export function DeviceColumn({ cells, devices }: Props) {
                 return (
                     <PairBox key={idx}>
                         <DeviceItem device={devices[cell.devices[0].id]} />
-
                         <DeviceItem device={devices[cell.devices[1].id]} />
                     </PairBox>
                 )
             })}
         </Col>
     )
-}
+})
 
 const Col = styled.div`
     flex: 1;
@@ -46,5 +49,5 @@ const PairBox = styled.div`
 `
 
 const Empty = styled.div`
-    height: auto;
+    height: 88px;
 `

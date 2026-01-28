@@ -1,8 +1,9 @@
-import styled, { useTheme } from "styled-components"
+import styled from "styled-components"
+import { memo } from "react"
 import { WashIcon, DryIcon } from "../../../assets"
 import { Text } from "../../common"
 
-interface IProps {
+interface Props {
     id: number
     type: "WASH" | "DRY"
     state: 0 | 1 | 2 | 3
@@ -10,88 +11,71 @@ interface IProps {
     onClick?: () => void
 }
 
-export function DeviceIcon({
+export const DeviceIcon = memo(function DeviceIcon({
     id,
     type,
     state,
     size = "medium",
     onClick,
-}: IProps) {
-    const theme = useTheme()
-
-    const getStateColor = (theme: any, state: 0 | 1 | 2 | 3) => {
-        switch (state) {
-            case 0:
-                return {
-                    background: theme.colors.Main.PrimaryContainer,
-                    icon: theme.colors.Main.Primary,
-                }
-            case 1:
-                return {
-                    background: theme.colors.Sub.OnTertiary,
-                    icon: theme.colors.Sub.Tertiary,
-                }
-            case 2:
-                return {
-                    background: theme.colors.Gray.Secondary,
-                    icon: theme.colors.Gray.OnSecondary,
-                }
-            case 3:
-                return {
-                    background: theme.colors.Sub.onError,
-                    icon: theme.colors.Sub.Error,
-                }
-            default:
-                return {
-                    background: theme.colors.Gray.Secondary,
-                    icon: theme.colors.Gray.OnSecondary,
-                }
-        }
-    }
-
-    const stateColor = getStateColor(theme, state)
-    const IconComponent = type === "WASH" ? WashIcon : DryIcon
-
+}: Props) {
     return (
-        <Wrapper
-            size={size}
-            $background={stateColor.background}
-            onClick={onClick}
-        >
-            <IconComponent
-                style={{ color: stateColor.icon }}
-                width={24}
-                height={24}
-            />
+        <Wrapper size={size} data-state={state} onClick={onClick}>
+            {type === "WASH" ? (
+                <WashIcon width={24} height={24} />
+            ) : (
+                <DryIcon width={24} height={24} />
+            )}
 
             <TextGroup>
-                <Text color="System.InverseSurface" font={"subTitle3"}>
+                <Text color="System.InverseSurface" font="subTitle3">
                     {id}번
                 </Text>
-                <Text color="System.InverseSurface" font={"body1"}>
+                <Text color="System.InverseSurface" font="body1">
                     {type === "WASH" ? "세탁기" : "건조기"}
                 </Text>
             </TextGroup>
         </Wrapper>
     )
-}
+})
 
-const Wrapper = styled.div<{
-    size: "medium" | "large"
-    $background: string
-}>`
+const Wrapper = styled.div<{ size: "medium" | "large" }>`
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
-    background: ${({ $background }) => $background};
     border-radius: 16px;
+    padding: 8px 0;
 
     width: ${({ size }) => (size === "large" ? "100%" : "50%")};
-    height: auto;
 
-    padding: 8px 0;
+    &[data-state="0"] {
+        background: ${({ theme }) => theme.colors.Main.PrimaryContainer};
+        svg {
+            color: ${({ theme }) => theme.colors.Main.Primary};
+        }
+    }
+
+    &[data-state="1"] {
+        background: ${({ theme }) => theme.colors.Sub.OnTertiary};
+        svg {
+            color: ${({ theme }) => theme.colors.Sub.Tertiary};
+        }
+    }
+
+    &[data-state="2"] {
+        background: ${({ theme }) => theme.colors.Gray.Secondary};
+        svg {
+            color: ${({ theme }) => theme.colors.Gray.OnSecondary};
+        }
+    }
+
+    &[data-state="3"] {
+        background: ${({ theme }) => theme.colors.Sub.onError};
+        svg {
+            color: ${({ theme }) => theme.colors.Sub.Error};
+        }
+    }
 `
 
 const TextGroup = styled.div`
