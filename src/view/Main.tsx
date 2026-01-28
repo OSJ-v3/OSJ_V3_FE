@@ -1,4 +1,5 @@
 import { useRef, useState, useLayoutEffect, useCallback, useMemo } from "react"
+import styled from "styled-components"
 import {
     HeaderTabBar,
     Text,
@@ -6,13 +7,13 @@ import {
     SkeletonMyDevice,
     NetworkError,
 } from "../components"
-import styled from "styled-components"
 import Status from "./Status"
 import { useStartStore, useAlarmStore, useNetworkStore } from "../stores"
 import { useMinSkeleton, useNetworkRenderState } from "../hooks"
 import { useDeviceStatusSocket } from "../domains/devices"
 
 const SKELETON_COUNT = 6
+const SWIPE_THRESHOLD = 50
 
 export default function Main() {
     const start = useStartStore((s) => s.start)
@@ -23,7 +24,8 @@ export default function Main() {
 
     const mineRef = useRef<HTMLDivElement>(null)
     const statusRef = useRef<HTMLDivElement>(null)
-    const [height, setHeight] = useState<number | null>(null)
+    const heightRef = useRef<number | null>(null)
+    const [, forceRender] = useState(0)
 
     const socket = useDeviceStatusSocket()
     const showSkeleton = useMinSkeleton(socket.loading, 500)
@@ -40,7 +42,10 @@ export default function Main() {
 
         const updateHeight = () => {
             const next = target.scrollHeight
-            setHeight((prev) => (prev === next ? prev : next))
+            if (heightRef.current !== next) {
+                heightRef.current = next
+                forceRender((v) => v + 1)
+            }
         }
 
         updateHeight()
@@ -59,12 +64,16 @@ export default function Main() {
 
     const onTouchEnd = useCallback(
         (e: React.TouchEvent) => {
-            if (touchStartX.current === null) return
+            const startX = touchStartX.current
+            if (startX === null) return
 
-            const diff = e.changedTouches[0].clientX - touchStartX.current
+            const diff = e.changedTouches[0].clientX - startX
 
-            if (diff > 50 && tab === "status") setTab("mine")
-            if (diff < -50 && tab === "mine") setTab("status")
+            if (diff > SWIPE_THRESHOLD && tab === "status") {
+                setTab("mine")
+            } else if (diff < -SWIPE_THRESHOLD && tab === "mine") {
+                setTab("status")
+            }
 
             touchStartX.current = null
         },
@@ -74,7 +83,7 @@ export default function Main() {
     const skeletons = useMemo(
         () =>
             Array.from({ length: SKELETON_COUNT }).map((_, i) => (
-                <SkeletonMyDevice key={i} aria-hidden="true" data-nosnippet />
+                <SkeletonMyDevice key={i} aria-hidden data-nosnippet />
             )),
         [],
     )
@@ -96,7 +105,13 @@ export default function Main() {
         <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <HeaderTabBar value={tab} onChange={setTab} />
 
-            <SlideContainer $height={height ?? undefined}>
+            <SlideContainer
+                $height={
+                    typeof heightRef.current === "number"
+                        ? heightRef.current
+                        : undefined
+                }
+            >
                 <SlideTrack $tab={tab}>
                     <SlidePage ref={mineRef}>
                         <TextContainer>
@@ -105,10 +120,7 @@ export default function Main() {
                                 font="heading2"
                                 role="heading"
                                 aria-level={1}
-                                style={{
-                                    fontSize: "24px",
-                                    fontWeight: 700,
-                                }}
+                                style={{ fontSize: 24, fontWeight: 700 }}
                             >
                                 알림 설정한
                                 <br />
@@ -156,12 +168,9 @@ const Wrapper = styled.div`
 const SlideContainer = styled.div<{ $height?: number }>`
     width: 100%;
     overflow: hidden;
-
     min-height: 100px;
-
     height: ${({ $height }) =>
         typeof $height === "number" ? `${$height}px` : "auto"};
-
     transition: height 0.2s ease;
 `
 
