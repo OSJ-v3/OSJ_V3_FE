@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import {
     NetworkError,
@@ -43,12 +43,18 @@ export default function Status({ loading, socket }: Props) {
     const { status } = useNetworkStore()
     const [present, setPresent] = useState(area)
 
+    const hasRenderedOnce = useRef(false)
+
+    useEffect(() => {
+        hasRenderedOnce.current = true
+    }, [])
+
     const showSkeleton = useMinSkeleton(loading, 500)
 
     const renderState = useNetworkRenderState({
         status,
-        loading,
-        showSkeleton,
+        loading: loading || !hasRenderedOnce.current,
+        showSkeleton: showSkeleton || !hasRenderedOnce.current,
     })
 
     const { layout, range } = AREA_CONFIG[present]
@@ -61,7 +67,7 @@ export default function Status({ loading, socket }: Props) {
         renderState === "skeleton",
     )
 
-    if (renderState === "error" || socket.error) {
+    if (renderState === "error") {
         return (
             <ErrorFill>
                 <NetworkError />

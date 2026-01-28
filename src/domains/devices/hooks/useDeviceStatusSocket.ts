@@ -15,19 +15,29 @@ export function useDeviceStatusSocket() {
 
     const stateMapRef = useRef<Map<number, DeviceState["state"]>>(new Map())
     const [version, setVersion] = useState(0)
+
     const [status, setStatus] = useState<SocketStatus>("connecting")
+    const [attemptFinished, setAttemptFinished] = useState(false)
+
+    const wsRef = useRef<WebSocket | null>(null)
 
     useEffect(() => {
         if (networkStatus !== "online") {
-            stateMapRef.current.clear()
-            setStatus("error")
+            setStatus("connecting")
+            setAttemptFinished(false)
             return
         }
 
-        const ws = new WebSocket(SOCKET_URL)
         setStatus("connecting")
+        setAttemptFinished(false)
 
-        ws.onopen = () => setStatus("connected")
+        const ws = new WebSocket(SOCKET_URL)
+        wsRef.current = ws
+
+        ws.onopen = () => {
+            setStatus("connected")
+            setAttemptFinished(true)
+        }
 
         ws.onmessage = (e) => {
             const data = JSON.parse(e.data)
@@ -48,14 +58,26 @@ export function useDeviceStatusSocket() {
             if (changed) setVersion((v) => v + 1)
         }
 
-        ws.onerror = ws.onclose = () => setStatus("error")
-        return () => ws.close()
+        const fail = () => {
+            setStatus("error")
+            setAttemptFinished(true)
+        }
+
+        ws.onerror = fail
+        ws.onclose = fail
+
+        return () => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.close()
+            }
+        }
     }, [networkStatus])
 
     return {
         stateMap: stateMapRef.current,
         version,
-        loading: status === "connecting",
-        error: status === "error",
+
+        loading: !attemptFinished,
+        error: attemptFinished && status === "error",
     }
 }
