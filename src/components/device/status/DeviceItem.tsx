@@ -7,7 +7,7 @@ import {
 } from "../.."
 
 interface Props {
-    device?: DeviceData
+    device: DeviceData
 }
 
 function isRealDevice(device: DeviceData): device is RealDeviceData {
@@ -16,8 +16,6 @@ function isRealDevice(device: DeviceData): device is RealDeviceData {
 
 export function DeviceItem({ device }: Props) {
     const [selected, setSelected] = useState<RealDeviceData | null>(null)
-
-    if (!device) return <div style={{ flex: 1 }} />
 
     if (!isRealDevice(device)) {
         return (
