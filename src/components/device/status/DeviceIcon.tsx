@@ -1,6 +1,7 @@
 import styled, { useTheme } from "styled-components"
 import { WashIcon, DryIcon } from "../../../assets"
 import { Text } from "../../common"
+import { useMemo } from "react"
 
 interface IProps {
     id: number
@@ -19,7 +20,7 @@ export function DeviceIcon({
 }: IProps) {
     const theme = useTheme()
 
-    const getStateColor = (theme: any, state: 0 | 1 | 2 | 3) => {
+    const stateColor = useMemo(() => {
         switch (state) {
             case 0:
                 return {
@@ -47,10 +48,9 @@ export function DeviceIcon({
                     icon: theme.colors.Gray.OnSecondary,
                 }
         }
-    }
+    }, [state, theme])
 
-    const stateColor = getStateColor(theme, state)
-    const IconComponent = type === "WASH" ? WashIcon : DryIcon
+    const Icon = type === "WASH" ? WashIcon : DryIcon
 
     return (
         <Wrapper
@@ -58,17 +58,13 @@ export function DeviceIcon({
             $background={stateColor.background}
             onClick={onClick}
         >
-            <IconComponent
-                style={{ color: stateColor.icon }}
-                width={24}
-                height={24}
-            />
+            <Icon style={{ color: stateColor.icon }} width={24} height={24} />
 
             <TextGroup>
-                <Text color="System.InverseSurface" font={"subTitle3"}>
+                <Text color="System.InverseSurface" font="subTitle3">
                     {id}번
                 </Text>
-                <Text color="System.InverseSurface" font={"body1"}>
+                <Text color="System.InverseSurface" font="body1">
                     {type === "WASH" ? "세탁기" : "건조기"}
                 </Text>
             </TextGroup>
@@ -89,7 +85,7 @@ const Wrapper = styled.div<{
     border-radius: 16px;
 
     width: ${({ size }) => (size === "large" ? "100%" : "50%")};
-    height: auto;
+    min-height: 88px;
 
     padding: 8px 0;
 `
