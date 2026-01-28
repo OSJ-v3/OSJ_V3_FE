@@ -6,7 +6,7 @@ export default defineConfig({
     plugins: [
         react(),
         VitePWA({
-            disable: true,
+            disable: false,
 
             includeAssets: [
                 "icons/favicon.ico",
