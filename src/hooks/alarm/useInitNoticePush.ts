@@ -5,17 +5,22 @@ export function useInitNoticePush() {
     const removeAlarm = useAlarmStore((s) => s.removeAlarm)
 
     useEffect(() => {
-        if (!navigator.serviceWorker) return
+        const id = requestIdleCallback(() => {
+            if (!navigator.serviceWorker) return
 
-        const handler = (e: MessageEvent) => {
-            if (e.data?.type === "DEVICE") {
-                removeAlarm(e.data.id)
+            const handler = (e: MessageEvent) => {
+                if (e.data?.type === "DEVICE") {
+                    removeAlarm(e.data.id)
+                }
             }
-        }
 
-        navigator.serviceWorker.addEventListener("message", handler)
-        return () => {
-            navigator.serviceWorker.removeEventListener("message", handler)
-        }
+            navigator.serviceWorker.addEventListener("message", handler)
+
+            return () => {
+                navigator.serviceWorker.removeEventListener("message", handler)
+            }
+        })
+
+        return () => cancelIdleCallback(id)
     }, [removeAlarm])
 }
