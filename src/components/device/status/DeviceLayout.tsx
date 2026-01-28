@@ -20,24 +20,25 @@ export function DeviceLayout({ layout, devices }: Props) {
 
     return (
         <Wrapper>
-            {layout.map((row: any, idx: number) => {
-                const leftCell = row[0] ? [row[0]] : []
-                const rightCell = row[1] ? [row[1]] : []
-
-                return (
-                    <Row key={idx}>
-                        <DeviceColumn cells={leftCell} devices={deviceMap} />
-                        <div
-                            style={{
-                                color: theme.colors.Gray.SurfaceContainerLowest,
-                            }}
-                        >
-                            <TriangleIcon width={12} />
-                        </div>
-                        <DeviceColumn cells={rightCell} devices={deviceMap} />
-                    </Row>
-                )
-            })}
+            {layout.map((row: any, idx: number) => (
+                <Row key={idx}>
+                    <DeviceColumn
+                        cells={row[0] ? [row[0]] : []}
+                        devices={deviceMap}
+                    />
+                    <div
+                        style={{
+                            color: theme.colors.Gray.SurfaceContainerLowest,
+                        }}
+                    >
+                        <TriangleIcon width={12} />
+                    </div>
+                    <DeviceColumn
+                        cells={row[1] ? [row[1]] : []}
+                        devices={deviceMap}
+                    />
+                </Row>
+            ))}
         </Wrapper>
     )
 }
