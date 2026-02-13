@@ -22,18 +22,8 @@ export function AreaSelector({ value, onChange }: Props) {
                     const selected = value === area
 
                     return (
-                        <AreaButton
-                            key={area}
-                            $selected={selected}
-                            $theme={theme}
-                            onClick={() => onChange(area)}
-                        >
-                            <Text
-                                font="button1"
-                                color={
-                                    selected ? "Surface" : "Gray.OnSecondary"
-                                }
-                            >
+                        <AreaButton key={area} $selected={selected} $theme={theme} onClick={() => onChange(area)}>
+                            <Text font="button1" color={selected ? "Surface" : "Gray.OnSecondary"}>
                                 {area}
                             </Text>
                         </AreaButton>
@@ -61,11 +51,10 @@ const AreaButton = styled.button<{
     $selected: boolean
     $theme: any
 }>`
-    padding: 10px 22px;
+    padding: 8px 16px;
     border: none;
     border-radius: 100px;
     cursor: pointer;
     transition: 200ms;
-    background: ${({ $selected, $theme }) =>
-        $selected ? $theme.colors.Main.Primary : $theme.colors.Gray.Secondary};
+    background: ${({ $selected, $theme }) => ($selected ? $theme.colors.Main.Primary : $theme.colors.Gray.Secondary)};
 `
