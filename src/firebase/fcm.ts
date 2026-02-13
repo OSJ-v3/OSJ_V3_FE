@@ -3,9 +3,7 @@ import { useFcmStore, useAlarmModalStore, useAlarmStore } from "../stores"
 import { getDeviceType, calcDuration } from "../utils"
 import { getFirebaseMessaging } from "./firebase"
 
-export async function requestPermissionAndSyncToken(
-    syncTokenToServer: (token: string) => Promise<void>,
-): Promise<string | null> {
+export async function requestPermissionAndGetToken(): Promise<string | null> {
     if (!("Notification" in window)) return null
 
     try {
@@ -17,23 +15,21 @@ export async function requestPermissionAndSyncToken(
 
         const registration = await navigator.serviceWorker.ready
 
-        const newToken = await getToken(messaging, {
+        const token = await getToken(messaging, {
             vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
             serviceWorkerRegistration: registration,
         })
 
-        if (!newToken) return null
+        if (!token) return null
 
         const { token: savedToken, setToken } = useFcmStore.getState()
-
-        if (savedToken !== newToken) {
-            await syncTokenToServer(newToken)
-            setToken(newToken)
+        if (savedToken !== token) {
+            setToken(token)
         }
 
-        return newToken
+        return token
     } catch (err) {
-        console.error("FCM token sync failed", err)
+        console.error("❌ FCM token request failed", err)
         return null
     }
 }
@@ -44,20 +40,45 @@ export async function listenForegroundMessage() {
 
     onMessage(messaging, (payload: MessagePayload) => {
         const data = payload.data
-        if (!data?.device_id || !data.prevAt || !data.now) return
+        if (!data) return
 
-        const id = Number(data.device_id)
-        if (Number.isNaN(id)) return
+        if (typeof data.title === "string" && typeof data.content === "string") {
+            handleNoticeAlarm(data)
+            return
+        }
 
-        const openAlarmModal = useAlarmModalStore.getState().open
-        const removeAlarm = useAlarmStore.getState().removeAlarm
+        if (
+            typeof data.device_id === "string" &&
+            /^\d+$/.test(data.device_id) &&
+            typeof data.prevAt === "string" &&
+            typeof data.now === "string"
+        ) {
+            handleDeviceAlarm(data)
+            return
+        }
+    })
+}
 
-        removeAlarm(id)
+function handleDeviceAlarm(data: any) {
+    const id = Number(data.device_id)
+    if (Number.isNaN(id)) return
 
-        openAlarmModal({
-            id,
-            type: getDeviceType(id),
-            duration: calcDuration(data.prevAt, data.now),
-        })
+    const openAlarmModal = useAlarmModalStore.getState().open
+    const removeAlarm = useAlarmStore.getState().removeAlarm
+
+    removeAlarm(id)
+
+    openAlarmModal({
+        id,
+        type: getDeviceType(id),
+        duration: calcDuration(data.prevAt, data.now),
+    })
+}
+
+function handleNoticeAlarm(data: any) {
+    if (Notification.permission !== "granted") return
+
+    new Notification(data.title, {
+        body: data.content,
     })
 }

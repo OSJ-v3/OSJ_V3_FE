@@ -7,26 +7,20 @@ import { ToastProvider } from "./contexts/ToastContext"
 import Main from "./view/Main"
 
 import { useSystemTheme, useThemeColor } from "./hooks"
-import {
-    useInitNoticePush,
-    useSyncAlarmFromServer,
-    useNetworkListener,
-} from "./hooks"
+import { useInitNoticePush, useSyncAlarmFromServer, useNetworkListener } from "./hooks"
 
 import { useThemeStore } from "./stores"
 import { darkTheme, lightTheme, GlobalStyle, AppLayout } from "./styles"
+import { useInitFCMNoticePush } from "./hooks/alarm/useInitFCMNoticePush"
+import { useInitDeviceAlarm } from "./hooks/alarm/useInitDeviceAlarm"
 
 const Notice = lazy(() => import("./view/Notice"))
 const Setting = lazy(() => import("./view/Setting"))
 const Complain = lazy(() => import("./view/Complain"))
 const Detail = lazy(() => import("./view/Detail"))
 
-const AlarmRenderer = lazy(() =>
-    import("./components").then((m) => ({ default: m.AlarmRenderer })),
-)
-const ToastRenderer = lazy(() =>
-    import("./components").then((m) => ({ default: m.ToastRenderer })),
-)
+const AlarmRenderer = lazy(() => import("./components").then((m) => ({ default: m.AlarmRenderer })))
+const ToastRenderer = lazy(() => import("./components").then((m) => ({ default: m.ToastRenderer })))
 
 function DeferredUI() {
     const [ready, setReady] = useState(false)
@@ -47,6 +41,8 @@ function DeferredUI() {
 }
 
 function DeferredEffects() {
+    useInitFCMNoticePush()
+    useInitDeviceAlarm()
     useInitNoticePush()
     useSyncAlarmFromServer()
     useNetworkListener()
@@ -58,13 +54,7 @@ function App() {
     const systemTheme = useSystemTheme()
 
     const appliedTheme =
-        mode === "system"
-            ? systemTheme === "dark"
-                ? darkTheme
-                : lightTheme
-            : mode === "dark"
-              ? darkTheme
-              : lightTheme
+        mode === "system" ? (systemTheme === "dark" ? darkTheme : lightTheme) : mode === "dark" ? darkTheme : lightTheme
 
     useThemeColor(appliedTheme.colors.Surface)
 
