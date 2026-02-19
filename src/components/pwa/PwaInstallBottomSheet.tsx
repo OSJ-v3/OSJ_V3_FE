@@ -1,4 +1,4 @@
-import { BottomSheet, Button, Text } from ".."
+import { BottomSheet, Button } from ".."
 
 interface Props {
     onClose: () => void
