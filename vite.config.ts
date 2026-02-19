@@ -7,6 +7,11 @@ export default defineConfig({
         react(),
         VitePWA({
             disable: false,
+            registerType: "autoUpdate",
+
+            devOptions: {
+                enabled: true,
+            },
 
             includeAssets: [
                 "icons/favicon.ico",
@@ -18,6 +23,7 @@ export default defineConfig({
             manifest: {
                 name: "OSJ",
                 short_name: "OSJ",
+                start_url: "/",
                 theme_color: "#000000",
                 background_color: "#ffffff",
                 display: "standalone",
