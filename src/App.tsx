@@ -13,6 +13,8 @@ import { useThemeStore } from "./stores"
 import { darkTheme, lightTheme, GlobalStyle, AppLayout } from "./styles"
 import { useInitFCMNoticePush } from "./hooks/alarm/useInitFCMNoticePush"
 import { useInitDeviceAlarm } from "./hooks/alarm/useInitDeviceAlarm"
+import { PwaInstallBottomSheet } from "./components/pwa/PwaInstallBottomSheet"
+import { usePwaInstallPrompt } from "./hooks/usePwaInstallPrompt"
 
 const Notice = lazy(() => import("./view/Notice"))
 const Setting = lazy(() => import("./view/Setting"))
@@ -71,6 +73,22 @@ function App() {
 }
 
 function AppInner() {
+    const { isInstallable, promptInstall } = usePwaInstallPrompt()
+    const [openPwaSheet, setOpenPwaSheet] = useState(false)
+
+    useEffect(() => {
+        const isStandalone = window.matchMedia("(display-mode: standalone)").matches
+
+        if (isInstallable && !isStandalone) {
+            setOpenPwaSheet(true)
+        }
+    }, [isInstallable])
+
+    const handleInstallPwa = async () => {
+        await promptInstall()
+        setOpenPwaSheet(false)
+    }
+
     return (
         <>
             <DeferredUI />
@@ -94,6 +112,10 @@ function AppInner() {
                     </Routes>
                 </Suspense>
             </AppLayout>
+
+            {openPwaSheet && (
+                <PwaInstallBottomSheet onClose={() => setOpenPwaSheet(false)} onInstall={handleInstallPwa} />
+            )}
         </>
     )
 }
