@@ -1,12 +1,5 @@
 import { ChevronDown } from "lucide-react"
-import {
-    type ReactNode,
-    useState,
-    useRef,
-    useLayoutEffect,
-    useEffect,
-    useCallback,
-} from "react"
+import { type ReactNode, useState, useRef, useLayoutEffect, useEffect, useCallback } from "react"
 import { createPortal } from "react-dom"
 import styled from "styled-components"
 import { Text } from "./Text"
@@ -19,13 +12,7 @@ interface BottomSheetProps {
     onClose: () => void
 }
 
-export function BottomSheet({
-    title,
-    caption,
-    children,
-    actions,
-    onClose,
-}: BottomSheetProps) {
+export function BottomSheet({ title, caption, children, actions, onClose }: BottomSheetProps) {
     const [mounted, setMounted] = useState(false)
     const [closing, setClosing] = useState(false)
 
@@ -109,20 +96,12 @@ export function BottomSheet({
                 </Handle>
 
                 <Header>
-                    <Text
-                        id="bottom-sheet-title"
-                        font="heading4"
-                        color="System.InverseSurface"
-                    >
+                    <Text id="bottom-sheet-title" font="heading4" color="System.InverseSurface">
                         {title}
                     </Text>
 
                     {caption && (
-                        <Text
-                            id="bottom-sheet-caption"
-                            font="body2"
-                            color="Gray.SurfaceContainer"
-                        >
+                        <Text id="bottom-sheet-caption" font="body2" color="Gray.SurfaceContainer">
                             {caption}
                         </Text>
                     )}
@@ -133,7 +112,7 @@ export function BottomSheet({
                 {actions && <ActionArea>{actions}</ActionArea>}
             </Sheet>
         </Overlay>,
-        portalRoot,
+        portalRoot
     )
 }
 
@@ -160,10 +139,10 @@ const Sheet = styled.div<{ $mounted: boolean; $closing: boolean }>`
     background: ${({ theme }) => theme.colors.System.OnSurface};
     padding: 16px 24px 24px;
 
-    transform: translateY(
-        ${({ $mounted, $closing }) =>
-            $closing ? "100%" : $mounted ? "0%" : "100%"}
-    );
+    outline: none;
+    border: none;
+
+    transform: translateY(${({ $mounted, $closing }) => ($closing ? "100%" : $mounted ? "0%" : "100%")});
 
     transition: transform 0.2s ease-out;
     will-change: transform;
