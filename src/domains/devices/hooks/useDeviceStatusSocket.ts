@@ -14,7 +14,8 @@ export function useDeviceStatusSocket() {
     const networkStatus = useNetworkStore((s) => s.status)
 
     const stateMapRef = useRef<Map<number, DeviceState["state"]>>(new Map())
-    const [version, setVersion] = useState(0)
+    const [stateMap, setStateMap] = useState<Map<number, DeviceState["state"]>>(new Map())
+    const [hasReceivedData, setHasReceivedData] = useState(false) // ← 추가
 
     const [status, setStatus] = useState<SocketStatus>("connecting")
     const [attemptFinished, setAttemptFinished] = useState(false)
@@ -36,7 +37,7 @@ export function useDeviceStatusSocket() {
 
         ws.onopen = () => {
             setStatus("connected")
-            setAttemptFinished(true)
+            // ← onopen에서 attemptFinished 안 올림
         }
 
         ws.onmessage = (e) => {
@@ -55,7 +56,13 @@ export function useDeviceStatusSocket() {
 
             Array.isArray(data) ? data.forEach(apply) : apply(data)
 
-            if (changed) setVersion((v) => v + 1)
+            if (changed) {
+                setStateMap(new Map(stateMapRef.current))
+                if (!hasReceivedData) {
+                    setHasReceivedData(true) // 첫 데이터 수신 시점에 로딩 해제
+                    setAttemptFinished(true) // ← onopen 대신 여기서
+                }
+            }
         }
 
         const fail = () => {
@@ -74,9 +81,7 @@ export function useDeviceStatusSocket() {
     }, [networkStatus])
 
     return {
-        stateMap: stateMapRef.current,
-        version,
-
+        stateMap,
         loading: !attemptFinished,
         error: attemptFinished && status === "error",
     }

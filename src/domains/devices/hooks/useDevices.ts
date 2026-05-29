@@ -5,19 +5,19 @@ import type { DeviceState } from "../types"
 
 interface Params {
     layout: LayoutCell[][]
-    states?: DeviceState[]
+    stateMap?: Map<number, DeviceState["state"]>
     range?: [number, number]
     forceSkeleton?: boolean
 }
 
-export function useDevices({ layout, states, range, forceSkeleton }: Params) {
+export function useDevices({ layout, stateMap, range, forceSkeleton }: Params) {
     if (forceSkeleton) {
         return mapLayoutToDevices(layout, skeletonState)
     }
 
-    if (!states || !range) {
+    if (!stateMap || !range) {
         return mapLayoutToDevices(layout, randomState)
     }
 
-    return mapLayoutToDevices(layout, socketState(states, range))
+    return mapLayoutToDevices(layout, socketState(stateMap, range))
 }

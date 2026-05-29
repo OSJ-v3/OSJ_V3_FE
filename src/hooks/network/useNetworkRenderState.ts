@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from "react"
+import { useMemo, useState, useEffect } from "react"
 import type { NetworkStatus } from "../../stores"
 
 interface Params {
@@ -7,21 +7,17 @@ interface Params {
     showSkeleton: boolean
 }
 
-export function useNetworkRenderState({
-    status,
-    loading,
-    showSkeleton,
-}: Params) {
-    const hasLoadedOnce = useRef(false)
+export function useNetworkRenderState({ status, loading, showSkeleton }: Params) {
+    const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
 
     useEffect(() => {
-        if (!loading) {
-            hasLoadedOnce.current = true
+        if (!loading && !hasLoadedOnce) {
+            setHasLoadedOnce(true)
         }
-    }, [loading])
+    }, [loading, hasLoadedOnce])
 
     return useMemo<"skeleton" | "error" | "content">(() => {
-        if (!hasLoadedOnce.current) {
+        if (!hasLoadedOnce) {
             return "skeleton"
         }
 
@@ -34,5 +30,5 @@ export function useNetworkRenderState({
         }
 
         return "content"
-    }, [status, loading, showSkeleton])
+    }, [status, loading, showSkeleton, hasLoadedOnce])
 }
