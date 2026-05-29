@@ -1,12 +1,6 @@
 import { useRef, useState, useLayoutEffect, useCallback, useMemo } from "react"
 import styled from "styled-components"
-import {
-    HeaderTabBar,
-    Text,
-    MyDevice,
-    SkeletonMyDevice,
-    NetworkError,
-} from "../components"
+import { HeaderTabBar, Text, MyDevice, SkeletonMyDevice, NetworkError } from "../components"
 import Status from "./Status"
 import { useStartStore, useAlarmStore, useNetworkStore } from "../stores"
 import { useMinSkeleton, useNetworkRenderState } from "../hooks"
@@ -77,41 +71,27 @@ export default function Main() {
 
             touchStartX.current = null
         },
-        [tab],
+        [tab]
     )
 
     const skeletons = useMemo(
-        () =>
-            Array.from({ length: SKELETON_COUNT }).map((_, i) => (
-                <SkeletonMyDevice key={i} aria-hidden />
-            )),
-        [],
+        () => Array.from({ length: SKELETON_COUNT }).map((_, i) => <SkeletonMyDevice key={i} aria-hidden />),
+        []
     )
 
     const alarmDevices = useMemo(
         () =>
             alarms.map((d) => (
-                <MyDevice
-                    key={`${d.type}-${d.id}`}
-                    id={d.id}
-                    type={d.type}
-                    state={socket.stateMap.get(d.id) ?? 2}
-                />
+                <MyDevice key={`${d.type}-${d.id}`} id={d.id} type={d.type} state={socket.stateMap.get(d.id) ?? 2} />
             )),
-        [alarms, socket.version],
+        [alarms, socket.stateMap]
     )
 
     return (
         <Wrapper onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <HeaderTabBar value={tab} onChange={setTab} />
 
-            <SlideContainer
-                $height={
-                    typeof heightRef.current === "number"
-                        ? heightRef.current
-                        : undefined
-                }
-            >
+            <SlideContainer $height={typeof heightRef.current === "number" ? heightRef.current : undefined}>
                 <SlideTrack $tab={tab}>
                     <SlidePage ref={mineRef}>
                         <TextContainer>
@@ -169,8 +149,7 @@ const SlideContainer = styled.div<{ $height?: number }>`
     width: 100%;
     overflow: hidden;
     min-height: 100px;
-    height: ${({ $height }) =>
-        typeof $height === "number" ? `${$height}px` : "auto"};
+    height: ${({ $height }) => (typeof $height === "number" ? `${$height}px` : "auto")};
     transition: height 0.2s ease;
 `
 

@@ -1,16 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
-import {
-    NetworkError,
-    AreaSelector,
-    SkeletonDeviceLayout,
-    DeviceLayout,
-} from "../components"
-import {
-    useMinSkeleton,
-    useNetworkRenderState,
-    useDevicesSocket,
-} from "../hooks"
+import { NetworkError, AreaSelector, SkeletonDeviceLayout, DeviceLayout } from "../components"
+import { useMinSkeleton, useNetworkRenderState, useDevicesSocket } from "../hooks"
 import { maleSchoolLayout, maleDormLayout, femaleLayout } from "../layouts"
 import { useAreaStore, useNetworkStore } from "../stores"
 
@@ -33,7 +24,6 @@ interface Props {
     loading: boolean
     socket: {
         stateMap: Map<number, 0 | 1 | 2 | 3>
-        version: number
         error: boolean
     }
 }
@@ -59,13 +49,7 @@ export default function Status({ loading, socket }: Props) {
 
     const { layout, range } = AREA_CONFIG[present]
 
-    const devices = useDevicesSocket(
-        layout,
-        socket.stateMap,
-        socket.version,
-        range,
-        renderState === "skeleton",
-    )
+    const devices = useDevicesSocket(layout, socket.stateMap, range, renderState === "skeleton")
 
     if (renderState === "error") {
         return (
@@ -79,13 +63,9 @@ export default function Status({ loading, socket }: Props) {
         <>
             <AreaSelector value={present} onChange={setPresent} />
 
-            {renderState === "skeleton" && (
-                <SkeletonDeviceLayout layout={layout} />
-            )}
+            {renderState === "skeleton" && <SkeletonDeviceLayout layout={layout} />}
 
-            {renderState === "content" && (
-                <DeviceLayout layout={layout} devices={devices} />
-            )}
+            {renderState === "content" && <DeviceLayout layout={layout} devices={devices} />}
         </>
     )
 }
